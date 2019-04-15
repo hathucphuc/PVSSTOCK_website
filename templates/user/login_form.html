@@ -1,0 +1,16 @@
+{% load crispy_forms_tags %}
+
+<form
+    action="{% url 'user:login' %}"
+    method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  {% if next %}
+    <input
+      type="hidden"
+      name="next"
+      value="{{ next }}">
+  {% endif %}
+  <button type="submit" class="btn btn-success">
+    {{ login_button|default:'Log in' }}</button>
+</form>

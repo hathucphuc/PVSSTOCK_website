@@ -1,0 +1,152 @@
+
+/* Hide hidden part */
+.hidden-part {
+  display: none;
+}
+
+/* Hide all steps by default: */
+.tab {
+  display: none;
+}
+
+#awsForm #azureForm #googleForm {
+  display: none;
+}
+
+#infoForm {
+  display: block;
+}
+
+/* Put asterisk mark(*) to fields Form */
+.required {
+  color: red;
+}
+
+/* Mark input boxes that gets an error on validation: */
+input.invalid {
+  background-color: #ffdddd;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#nextBtn {
+  margin-left: 20px;
+  border: none;
+}
+
+#prevBtn {
+  background-color: #bbbbbb;
+  border: none;
+}
+
+div.fontz {
+	font-size: 20px;
+}
+.btn-secondary.active {
+    
+   background-color:#ffc107 !important;
+}
+
+/* Table */
+th {
+  text-align: right;
+  padding: 10px;
+}
+td {
+  width:50%;
+  text-align: left;
+}
+
+
+
+/* Make circles that indicate the steps of the form: */
+.md-stepper-horizontal {
+  display:table;
+  width:100%;
+  margin:0 auto;
+  
+}
+
+.md-step {
+  display:table-cell;
+  position:relative;
+  padding:24px;
+}
+
+.md-step-circle {
+  width:30px;
+  height:30px;
+  margin:0 auto;
+  background-color:#999999;
+  border-radius: 50%;
+  text-align: center;
+  line-height:30px;
+  font-size: 16px;
+  font-weight: 600;
+  color:#FFFFFF;
+}
+
+/* Title */
+
+.md-step-title {
+  text-align: center;
+  color:rgba(0,0,0,.26);
+  margin-top:16px;
+  font-size:12px;
+  font-weight:600;
+}
+
+/* Mark the active step: */
+.md-step.active .md-step-circle {
+  background-color:#F96302;
+}
+
+.md-step.active .md-step-title {
+  font-weight:600;
+  color:rgba(0,0,0,.87);
+}
+
+/* Mark the steps that are finished and valid: */
+.md-step.finish .md-step-circle {
+  background-color:#00AE4D;
+}
+
+.md-step.finish .md-step-title {
+  font-weight:600;
+  color:#00AE4D;
+}
+
+.md-step.finish.active .md-step-circle {
+  opacity: 0.5 ;
+}
+
+.md-step.finish.active .md-step-title {
+  opacity: 0.5 ;
+}
+
+.md-step-bar-right {
+  position:absolute;
+  top:36px;
+  height:1px;
+  border-top:1px solid #DDDDDD;
+  right:0;
+  left:50%;
+  margin-left:20px;
+}
+
+.md-step-bar-left {
+  position:absolute;
+  top:36px;
+  height:1px;
+  border-top:1px solid #DDDDDD;
+  left:0;
+  right:50%;
+  margin-right:20px;
+}
+
+.md-stepper-horizontal .md-step:first-child .md-step-bar-left,
+.md-stepper-horizontal .md-step:last-child .md-step-bar-right {
+  display:none;
+}

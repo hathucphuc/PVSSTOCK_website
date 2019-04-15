@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{block.super}} - Logged Out
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:190px">
+	<h1 style="margin-top:180px">Login Again</h1>
+	<div class="offset-by-two eight columns">
+		<p>You've successfully logged out.</p>
+		{% include 'user/login_form.html' with login_button='Log Back In' %}
+	</div>
+</div>
+{% endblock %}

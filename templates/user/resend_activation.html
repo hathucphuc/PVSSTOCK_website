@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{block.super}} - Resend Activation E-Mail
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 style="margin-top:180px">Resend your account activation email</h1>
+	<div>
+		<form action="{% url 'user:resend_activation' %}" method="post">
+			{% csrf_token %}
+			{{form|crispy}}
+			<button type="submit" class="btn btn-success">Resend</button>
+		</form>
+			
+	</div>
+</div>
+{% endblock %}

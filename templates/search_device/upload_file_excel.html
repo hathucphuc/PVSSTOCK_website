@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{block.super}} - Upload File Excel
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container" style="margin-top:140px;margin-bottom:60px;">
+	<h2>Upload Your File</h2>
+	<div class="form-group">
+		<form action="{% url 'import_data' %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		{{form|crispy}}
+		<button type="submit" class="btn btn-primary">Start Upload</button>
+		</form>
+	</div>
+
+</div>
+{% endblock %}

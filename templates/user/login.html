@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{block.super}} - Login
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 style="margin-top:190px">Login</h1>
+	<div class="row ">
+	<div class="col-sm-auto">
+		{% include "user/login_form.html" %}
+	</div>
+	<div class="col col-lg-3" style="margin-top:35px">
+      <ul class="task-list">
+      	<li><a href="{% url 'user:create_provider' %}">
+          Register New Account</a></li>
+        <li><a href="{% url 'user:pw_reset_start' %}">
+          Forgotten password?</a></li>
+        <li><a href="{% url 'user:resend_activation' %}">
+          Lost Activation E-Mail?</a></li>
+      </ul>
+    </div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+/* Hide all steps by default: */
+.tab {
+  display: none;
+}
+
+/* Make circles that indicate the steps of the form: */
+.step {
+  height: 40px;
+  width: 100px;
+  padding: 8px 12px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-right: 100px;
+  margin-bottom: 50px;
+  background-color: #bbbbbb;
+  border: none; 
+  border-radius: 8px;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+/* Mark the active step: */
+.step.active {
+  opacity: 1;
+}
+
+/* Mark the steps that are finished and valid: */
+.step.finish {
+  background-color: #4CAF50;
+}
+
+/* Mark input boxes that gets an error on validation: */
+input.invalid {
+  background-color: #ffdddd;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#nextBtn {
+  margin-left: 20px;
+  border: none;
+}
+
+#prevBtn {
+  background-color: #bbbbbb;
+  border: none;
+}
+
+div.fontz {
+	font-size: 20px;
+}

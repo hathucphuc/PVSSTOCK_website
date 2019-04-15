@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{block.super}} - Profile
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:160px;">
+
+	<div class="row justify-content-center">
+		<div class="col-md-6 ">
+			<div class="profile-head">
+				<h4>{{user.provider.name}}</h4>
+				<h6>{{roles}}</h6>
+				<ul class="nav nav-tabs" href="#about">
+					<li class="nav-item">
+						<a class="nav-link active" id="about-tab" href="#about">About</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#edit" id="edit-tab">Edit</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-2">
+			<a href="{% url 'user:pw_change' %}"><button class="btn btn-secondary" type="button" style="margin-bottom:30px;">Change Password				
+			</button></a>
+		</div>
+		
+	</div>
+	
+	<div class="row justify-content-center" >
+		<div class="col-md-8">
+			<div class="tab-content profile-tab">
+			<div class="tab-pane fade show active" id="about">
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					User Id
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.id}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.name}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Full Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.full_name}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Email
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.email}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Phone
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.phone}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Website Link
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.url}}</p>
+				</div>
+			</div>
+			</div>
+
+			<div class="tab-pane fade" id="edit">
+				<form action="{% url 'user:profile' %}" method="post">
+					{% csrf_token %}
+					{% if form.name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Name</label>
+						{% if form.name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form..value}}"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="name"></div>
+						{% endif %}
+					</div>
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Full Name</label>
+						{% if form.full_name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" value="{{form.full_name.value}}"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name"></div>
+						{% endif %}
+					</div>
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Email</label>
+						{% if form.email.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" value="{{form.email.value}}"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" ></div>
+						{% endif %}
+					</div>
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Phone</label>
+						{% if form.phone.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone" value="{{form.phone.value}}"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone"></div>
+						{% endif %}
+					</div>
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Website Link</label>
+						{% if form.url.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="url" value="{{form.url.value}}"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="url"></div>
+						{% endif %}
+					</div>
+					
+					<p style="font-size:0.8em;color:red;"><i>( * just fill out the fields which you want to change infomation.)</i></p>
+					<button class="btn btn-success" type="submit" style="float:right;">Confirm</button>
+				</form>
+
+
+
+			</div>
+			
+		</div>
+		</div>
+
+	</div>
+
+
+</div>
+<script>
+$(document).ready(function() {
+	$("#about-tab").click(function() {
+		if ($(this).hasClass("active")) {
+			return false;
+		} else {
+			$(this).toggleClass("active");
+			$("#about").toggleClass("show").toggleClass("active");
+			$("#edit-tab").removeClass("active");
+			$("#edit").removeClass("show active");
+		} // end if
+
+			
+
+	});// end click
+
+	$("#edit-tab").click(function() {
+		if ($(this).hasClass("active")) {
+			return false;
+		} else {
+			$(this).toggleClass("active");
+			$("#edit").toggleClass("show").toggleClass("active");
+			$("#about-tab").removeClass("active");
+			$("#about").removeClass("show active");
+		} //end if
+	});//end click
+
+});// end ready
+	
+
+</script>
+
+{% endblock %}
+
+

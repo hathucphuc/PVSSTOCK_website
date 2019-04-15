@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{block.super}} - Create Provider Account
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<h1 style="margin-top:180px">Create Provider Account</h1>
+	<div class="offset-by-two eight columns">
+		<div class="center">
+			<a href="{% url 'user:resend_activation' %}">
+          Lost Activation E-Mail?</a>
+		</div>
+		<form action="{% url 'user:create_provider' %}" method="post">
+			{% csrf_token %}
+			{{form|crispy}}
+			<button type="submit" class="btn btn-success">Create</button>
+		</form>
+			
+	</div>
+</div>
+{% endblock %}

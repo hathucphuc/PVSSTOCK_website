@@ -9,6 +9,7 @@ from django.utils.text import slugify
 
 from .utils import ActivationMailFormMixin
 from .models import Provider
+from search_device.models import ManageDevice
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ class ProviderSignUpForm(ActivationMailFormMixin,UserCreationForm):
         return full_name
 
     @transaction.atomic
-    def save(self):
+    def save(self,**kwargs):
         user = super().save(commit=False)
         user.is_provider = True
         if not user.pk:
@@ -181,10 +182,12 @@ class ProviderChangeForm(forms.Form):
         provider = Provider.objects.get(user=user)
         if self.cleaned_data["name"]:
             provider.name = self.cleaned_data['name']
+            ManageDevice.objects.filter(user=user).update(provider=self.cleaned_data['name'])
         if self.cleaned_data["full_name"]:
             provider.full_name = self.cleaned_data['full_name']
         if self.cleaned_data["phone"]:
             provider.phone = self.cleaned_data['phone']
+            ManageDevice.objects.filter(user=user).update(phone=self.cleaned_data['phone'])
         if self.cleaned_data["url"]:
             provider.url = self.cleaned_data['url']
         provider.save()
@@ -194,8 +197,6 @@ class ProviderChangeForm(forms.Form):
         user.save()
 
         return provider
-
-
 
 
 

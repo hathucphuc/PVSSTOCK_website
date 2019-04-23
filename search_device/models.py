@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from user.models import User
 
 # Create your models here.
@@ -19,3 +20,9 @@ class ManageDevice(models.Model):
 
 	def __str__(self):
 		return "{} {}".format(self.brand,self.model)
+
+	def get_update_url(self):
+		return reverse("edit_device",kwargs={"pk":self.pk})
+
+	def get_delete_url(self):
+		return reverse("delete_device",kwargs={"pk":self.pk})

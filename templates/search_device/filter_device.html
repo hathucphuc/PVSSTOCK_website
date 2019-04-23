@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{block.super}} - Filter Device
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container" style="margin-top:160px;margin-bottom:60px;">
+	<form action="{% url 'search_device' %}" method="post" id="form">
+    {% csrf_token %}
+    <div class="input-group">
+      {% if form.search.value %}
+      <input type="text" name="search" value="{{form.search.value}}" class="form-control form-control-lg border-secondary py-2" required pattern="\S+">
+      {% else %}
+      <input type="text" name="search" class="form-control form-control-lg border-secondary py-2" placeholder="Search">
+      {% endif %}
+      <div class="input-group-append">
+        <button type="button" class="btn btn-warning" id="search"><i class="fa fa-search fa-lg"></i></button>
+      </div>
+    </div>
+
+    <button class="btn btn-link btn-sm" id="show" type="button">Advance Search<i class="fas fa-angle-double-down" style="padding-left:3px;"></i></button>
+
+  </form>
+
+
+  <div id="filter" style="display:block;">
+    <form action="{% url 'search_device' %}" id="form_filter" method="post">
+      <h4>Filter</h4>
+      {% csrf_token %}
+    <div class="row">
+      <div class="form-group col-sm-4">
+        <label for="brand">Brand</label>
+        {% if form_filter.brand.value %}
+        
+        <input type="text" class="form-control" name="brand" id="brand" value="{{form_filter.brand.value}}">
+        {% else %}
+        <input type="text" class="form-control" name="brand" id="brand">
+        {% endif %}
+      </div>
+      <div class="form-group col-sm-4">
+        <label for="model">Model</label>
+        {% if form_filter.model.value %}
+        <input type="text" class="form-control" name="model" id="model" value="{{form_filter.model.value}}">
+        {% else %}
+        <input type="text" class="form-control" name="model" id="model">
+        {% endif %}
+      </div>
+      <div class="form-group col-sm-4">
+        <label for="kind">Kind</label>
+        {% if form_filter.kind.value %}
+        <input type="text" class="form-control" name="kind" id="kind" value="{{form_filter.kind.value}}">
+        {% else %}
+        <input type="text" class="form-control" name="kind" id="kind">
+        {% endif %}
+      </div>
+      <div class="form-group col-sm-4">
+        <label for="description">Description</label>
+        {% if form_filter.description.value %}
+        <input type="text" class="form-control" name="description" id="description" value="{{form_filter.description.value}}">
+        {% else %}
+        <input type="text" class="form-control" name="description" id="description">
+        {% endif %}
+      </div>
+      <div class="form-group col-sm-4">
+        <label for="provider">Provider</label>
+        {% if form_filter.provider.value %}
+        <input type="text" class="form-control" name="provider" id="provider" value="{{form_filter.provider.value}}">
+        {% else %}
+        <input type="text" class="form-control" name="provider" id="provider">
+        {% endif %}
+      </div>
+    </div>
+    <button class="btn" id="search_adv" type="button">Search</button>
+    <button class="btn btn-link btn-sm" type="button" id="hide"><i class="fas fa-angle-double-up" style="padding-right:3px;"></i>hide</button>
+    
+  </div>
+  
+{% if results %}
+<table class="table table-bordered" style="text-align:center;margin-top:30px;vertical-align: middle;">
+	<thead>
+    <tr style="background-color:lightgray">
+      <th>Brand</th>
+      <th>Model</th>
+      <th>Kind</th>
+      <th>Description</th>
+      <th>Quantity</th>
+      <th>Provider</th>
+      <th>Phone</th>
+
+    </tr>
+    </thead>
+  {% for result in results %}
+    <tbody>
+    	<tr style="background-color:DeepSkyBlue">
+    		<td>{{result.0}}</td>
+    		<td>{{result.1}}</td>
+    		<td>{{result.2}}</td>
+    		<td>{{result.3}}</td>
+    		<td>{{result.4}}</td>
+    		<td>{{result.5}}</td>
+    		<td>{{result.6}}</td>
+    	</tr>
+    </tbody>
+  {% endfor %}
+</table>
+<div class="pagination">
+  <a href="#" id="prevnav"><i class="fas fa-chevron-left fa-lg"></i></a>
+  <a href="#" id="nextnav"><i class="fas fa-chevron-right fa-lg"></i></a>
+</div>
+{% else %}
+<h4>No results</h4>
+
+{% endif %}
+<script>
+  $(document).ready(function() {
+    $("#filter").show();
+    $("#show").click(function() {
+      $("#filter").slideDown(100);
+      $(this).hide();
+
+    }); // end click
+
+    $("#hide").click(function() {
+      $("#filter").slideUp(100);
+      $("#show").show();
+    }); // end click
+
+    $("#search").click(function() {
+      $("#form").submit();
+    }); // end click
+
+    $("#search_adv").click(function() {
+      var brand = $("#brand").val();
+      var model = $("#model").val();
+      var description = $("#description").val();
+      var kind = $("#kind").val();
+      var provider = $("provider").val();
+
+      if (brand==""&&model==""&&description==""&&kind==""&&provider=="") {
+        alert("Please fill out at least one field!");
+        return false;
+      } // end if
+      $("#form_filter").submit();
+
+    }); // end click
+
+  }); // end ready
+</script>
+
+</div>
+{% endblock %}

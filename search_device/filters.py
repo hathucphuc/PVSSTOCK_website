@@ -1,5 +1,5 @@
 from .models import ManageDevice
-'''
+
 import django_filters
 
 
@@ -8,8 +8,8 @@ class DeviceFilter(django_filters.FilterSet):
 	model = django_filters.CharFilter(lookup_expr="icontains")
 	kind = django_filters.CharFilter(lookup_expr="icontains")
 	provider = django_filters.CharFilter(lookup_expr="icontains")
+	description = django_filters.CharFilter(lookup_expr="icontains")
 
 	class Meta:
 		model = ManageDevice
-		fields = ["brand","model","kind","provider"]
-'''
+		fields = ["brand","model","kind","provider","description"]

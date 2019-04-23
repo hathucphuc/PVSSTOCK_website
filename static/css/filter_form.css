@@ -1,0 +1,22 @@
+
+
+#filter {
+	background-color: #FAFAD2;
+	margin-top: 20px;
+	display: none;
+
+}
+
+#form_filter {
+	padding: 10px;
+}
+
+#hide {
+	float: right;
+}
+
+#search_adv {
+	background-color: #1E90FF;
+	color:white;
+}
+

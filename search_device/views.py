@@ -3,8 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 import xlrd, os
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.views.generic import DeleteView
+from django.urls import reverse_lazy
+from django.http import HttpResponse
 
-from .forms import UploadForm, SearchDeviceForm
+from .forms import UploadForm, SearchDeviceForm, AddDeviceForm, FilterForm
 from .models import ManageDevice
 #from .filters import DeviceFilter
 # Create your views here.
@@ -32,6 +35,7 @@ def import_data(request):
 			path = "/Users/haphuc/onedrive/Learning_Pyhton/GITHUB/PVSSTOCK_website/media/upload_excel/%s" %(request.FILES["file_excel"].name)
 
 			workbook = xlrd.open_workbook(path)
+			os.remove(path)
 
 			# number of sheets
 			sheets = workbook.nsheets
@@ -46,20 +50,32 @@ def import_data(request):
 					row = []
 					for c in range(num_columns):
 						row.append(sheet.cell(r,c).value)
-					
-					ManageDevice.objects.create(brand=row[0],model=row[1],kind=row[2],description=row[3],quantity=row[4],provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
-			os.remove(path)
-			return redirect("search_device")
+					if type(row[1])==str:
+						model = row[1]
+					else:
+						model = int(row[1])
+					try:
+
+						ManageDevice.objects.create(brand=row[0],model=model,kind=row[2],description=row[3],quantity=int(row[4]),provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
+					except:
+						return HttpResponse("Your file excel has value of quantity column is a string.")
+			
+			return redirect("user:profile")
 	else:
 		form = UploadForm()
 		return render(request,"search_device/upload_file_excel.html",{"form":form})
 
 					
 def search_device(request):
+	devices = ManageDevice.objects.all()
+	
+
+	
 	if request.method == "POST":
 		form_result = SearchDeviceForm(request.POST)
+		form_filter = FilterForm(request.POST)
 		if form_result.is_valid():
-			devices = ManageDevice.objects.all()
+			
 
 			info = form_result.cleaned_data["search"]
 			info = info.split()
@@ -74,8 +90,78 @@ def search_device(request):
 			
 
 			form = SearchDeviceForm(initial={"search":form_result.cleaned_data["search"]})
+			form_filter = FilterForm()
 
-			return render(request,"search_device/results.html",{"results":results,"form":form,"devices":devices})
+			return render(request,"search_device/results.html",{"results":results,"form":form,"form_filter":form_filter,"devices":devices})
+
+		elif form_filter.is_valid():
+			brand = form_filter.cleaned_data["brand"]
+			model = form_filter.cleaned_data["model"]
+			kind = form_filter.cleaned_data["kind"]
+			description = form_filter.cleaned_data["description"]
+			provider = form_filter.cleaned_data["provider"]
+
+			if brand:
+				brand_set = ManageDevice.objects.filter(brand__icontains=brand)
+			else:
+				brand_set = ManageDevice.objects.all()
+			if model:
+				model_set = ManageDevice.objects.filter(model__icontains=model)
+			else:
+				model_set = ManageDevice.objects.all()
+			if kind:
+				kind_set = ManageDevice.objects.filter(kind__icontains=kind)
+			else:
+				kind_set = ManageDevice.objects.all()
+			if description:
+				description_set = ManageDevice.objects.filter(description__icontains=description)
+			else:
+				description_set = ManageDevice.objects.all()
+
+			if provider:
+				provider_set = ManageDevice.objects.filter(provider__icontains=provider)
+			else:
+				provider_set = ManageDevice.objects.all()
+
+			brand_set = set(list(brand_set.values_list("brand","model","kind","description","quantity","provider","phone")))
+			model_set = set(list(model_set.values_list("brand","model","kind","description","quantity","provider","phone")))
+			kind_set = set(list(kind_set.values_list("brand","model","kind","description","quantity","provider","phone")))
+			description_set = set(list(description_set.values_list("brand","model","kind","description","quantity","provider","phone")))
+			provider_set = set(list(provider_set.values_list("brand","model","kind","description","quantity","provider","phone")))
+
+			set_all = brand_set.intersection(model_set).intersection(kind_set).intersection(description_set).intersection(provider_set)
+			results = list(set_all)
+
+			
+			form_filter=FilterForm(initial={"brand":brand,"model":model,"description":description,"kind":kind, "provider":provider})
+			form = SearchDeviceForm()
+			return render(request,"search_device/filter_device.html",{"results":results,"form_filter":form_filter,"form":form})
+		
 	else:
 		form = SearchDeviceForm()
-		return render(request,"search_device/search_device.html",{"form":form})
+		return render(request,"search_device/search_device.html",{"form":form,})
+
+
+def edit_device(request,pk):
+    device = ManageDevice.objects.get(pk=pk)
+    if request.method == "POST":
+        form = AddDeviceForm(request.POST,user=request.user)
+        if form.is_valid():
+            
+            device.brand = form.cleaned_data["brand"]
+            device.model = form.cleaned_data["model"]
+            device.kind = form.cleaned_data["kind"]
+            device.description = form.cleaned_data["description"]
+            device.quantity = form.cleaned_data["quantity"]
+            device.save()
+            return redirect("user:profile")
+    else:
+
+        form = AddDeviceForm(initial={"brand":device.brand,"model":device.model,"description":device.description,"kind":device.kind,"quantity":device.quantity})
+        return render(request,"search_device/edit_device.html",{"form":form,"device":device})
+
+class DeviceDelete(DeleteView):
+	model = ManageDevice
+	success_url = reverse_lazy("user:profile")
+	template_name = "search_device/delete_device.html"
+	

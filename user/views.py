@@ -27,6 +27,9 @@ from django.views.generic import View
 from .utils import MailContextViewMixin
 from .forms import (
     ResendActivationEmailForm, ProviderSignUpForm, ProviderChangeForm)
+from search_device.forms import AddDeviceForm
+from search_device.models import ManageDevice
+
 
 # Create your views here.
 
@@ -146,12 +149,22 @@ def profile(request):
         roles = "Provider"
     if request.method == "POST":
         form = ProviderChangeForm(request.POST,user=request.user)
-        if form.is_valid():
+        form_add = AddDeviceForm(request.POST,user=request.user)
+        if form_add.is_valid():
+            form_add.save()
+            return redirect("user:profile")
+        elif form.is_valid():
             form.save()
-        return redirect("user:profile")
+            return redirect("user:profile")
+        
+        
+    else:
+        form = ProviderChangeForm()
+        form_add = AddDeviceForm()
+        list_device = ManageDevice.objects.filter(user=user)
+        return render(request,"user/profile.html",{"form":form,"form_add":form_add,"user":user,"roles":roles,"list_device":list_device})
 
-    form = ProviderChangeForm()
-    return render(request,"user/profile.html",{"form":form,"user":user,"roles":roles})
+
 
 
 

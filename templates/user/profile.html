@@ -20,6 +20,9 @@
 					<li class="nav-item">
 						<a class="nav-link" href="#edit" id="edit-tab">Edit</a>
 					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#device" id="device-tab">Devices</a>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -85,7 +88,7 @@
 			</div>
 
 			<div class="tab-pane fade" id="edit">
-				<form action="{% url 'user:profile' %}" method="post">
+				<form action="{% url 'user:profile' %}" method="post" id="form">
 					{% csrf_token %}
 					{% if form.name.errors %}
 				      <ul class="custom_error_list">
@@ -97,7 +100,7 @@
 					<div class="form-group row">
 						<label for="" class="col-sm-3 col-form-label">Name</label>
 						{% if form.name.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form..value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form.name.value}}"></div>
 						{% else %}
 						<div class="col-sm-9"><input type="text" class="form-control" name="name"></div>
 						{% endif %}
@@ -136,11 +139,108 @@
 					</div>
 					
 					<p style="font-size:0.8em;color:red;"><i>( * just fill out the fields which you want to change infomation.)</i></p>
-					<button class="btn btn-success" type="submit" style="float:right;">Confirm</button>
+					<button class="btn btn-success" type="button" style="float:right;" id="change_bt">Confirm</button>
 				</form>
 
+			</div>
+			<div class="tab-pane fade" id="device">
+				<div class="row justify-content-center">
+					<div class="col-10">
+					<div class="input-group" style="width:100%">
+						<input type="text" name="" placeholder="Search..." class="search_input" id="search">
+						<div class="input-group-append">
+						<button class="btn btn-light search_icon" disabled><i class="fa fa-search"></i></button>
+						</div>
+					</div>
+					</div>
+					<div class="col-2">
+						<p id="open">Add</p>
+					</div>
+				</div>
+				<div id="add">
+			
+					<form action="{% url 'user:profile' %}" method="post" id="form_add">
+						{% csrf_token %}
+						<div class="form-group row">
+							<label for="brand" class="col-sm-3 col-form-label">Brand<span class="required">*</span></label>
+							{% if form_add.brand.value %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="brand" value="{{form_add.brand.value}}" id="brand" required pattern="\S+"></div>
+							{% else %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="brand" id="brand" required pattern="\S+"></div>
+							{% endif %}
+						</div>
+						<div class="form-group row">
+							<label for="" class="col-sm-3 col-form-label">Model<span class="required">*</span></label>
+							{% if form_add.model.value %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="model" value="{{form_add.model.value}}" required pattern="\S+" id="model"></div>
+							{% else %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="model" required pattern="\S+" id="model"></div>
+							{% endif %}
+						</div>
+						<div class="form-group row">
+							<label for="" class="col-sm-3 col-form-label">Description<span class="required">*</span></label>
+							{% if form_add.description.value %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="description" value="{{form_add.description.value}}" required pattern="\S+" id="description"></div>
+							{% else %}
+							<div class="col-sm-9"><input type="text" class="form-control" name="description" required pattern="\S+" id="description"></div>
+							{% endif %}
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<label for="quantity" class="col-sm-6 col-form-label">Quantity<span class="required">*</span></label>
+									{% if form_add.quantity.value %}
+									<div class="col-sm-6"><input type="text" class="form-control" name="quantity" value="{{form_add.quantity.value}}" id="quantity" required pattern="\S+"></div>
+									{% else %}
+									<div class="col-sm-6"><input type="text" class="form-control" name="quantity" id="quantity" required pattern="\S+"></div>
+									{% endif %}
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<label for="kind" class="col-sm-3 col-form-label">Kind<span class="required">*</span></label>
+									{% if form_add.kind.value %}
+									<div class="col-sm-9"><input type="text" class="form-control" name="kind" value="{{form_add.kind.value}}" required pattern="\S+" id="kind"></div>
+									{% else %}
+									<div class="col-sm-9"><input type="text" class="form-control" name="kind" required pattern="\S+" id="kind"></div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						<button class="btn" type="button" id="add_bt">Add</button>
+					</form>
+				</div>
+				{% if list_device %}
+				<table class="table table-bordered" style="text-align:center;margin-top:20px;vertical-align: middle;">
+					<thead>
+				    <tr style="background-color:lightgray">
+				      <th>Brand</th>
+				      <th>Model</th>
+				      <th>Kind</th>
+				      <th>Description</th>
+				      <th>Quantity</th>
+				  
 
+				    </tr>
+				    </thead>
+				  {% for device in list_device %}
+				    <tbody>
+				    	<tr style="background-color:rgb(254,250,246);">
+				    		<td>{{device.brand}}</td>
+				    		<td><a href="{{device.get_update_url}}">{{device.model}}</a></td>
+				    		<td>{{device.kind}}</td>
+				    		<td>{{device.description}}</td>
+				    		<td>{{device.quantity}}</td>
 
+				    	</tr>
+				    </tbody>
+				  {% endfor %}
+				</table>
+
+				{% else %}
+				<h4>No Device</h4>
+
+				{% endif %}
 			</div>
 			
 		</div>
@@ -152,34 +252,85 @@
 </div>
 <script>
 $(document).ready(function() {
-	$("#about-tab").click(function() {
+	$(".nav-link").click(function() {
 		if ($(this).hasClass("active")) {
 			return false;
 		} else {
-			$(this).toggleClass("active");
-			$("#about").toggleClass("show").toggleClass("active");
-			$("#edit-tab").removeClass("active");
-			$("#edit").removeClass("show active");
-		} // end if
+			$(".nav-link").removeClass("active");
+			$(this).addClass("active");
+			var id = $(this).attr("href");
+			$(".tab-pane.fade").removeClass("show active");
+			$(id).addClass("show active");
 
-			
+		} // end if			
 
 	});// end click
+	$("#open").click(function() {
+		
+		$("#add form").stop().slideToggle();
+		$("#brand").focus();
+		
+		$(this).toggleClass("closed");
+	}); //end click
 
-	$("#edit-tab").click(function() {
-		if ($(this).hasClass("active")) {
+	$("#change_bt").click(function() {
+		$("#form").submit();
+		
+	}); //end click
+	$("#add_bt").click(function() {
+
+		var quantity = $("#quantity").val();
+		var brand = $("#brand").val();
+		var model = $("#model").val();
+		var description = $("#description").val();
+		var kind = $("#kind").val();
+		if (isNaN(quantity)) {
+			alert("Please supply a number to quantity field!");
 			return false;
-		} else {
-			$(this).toggleClass("active");
-			$("#edit").toggleClass("show").toggleClass("active");
-			$("#about-tab").removeClass("active");
-			$("#about").removeClass("show active");
-		} //end if
-	});//end click
+		}
+		if (brand==""||model==""||description==""||kind==""|quantity=="") {
+			alert("Please fill out all the fields!");
+			return false;
+		}
 
+		$("#form_add").submit(
+		);// end submit
+	}); // end click
+	$("#quantity").blur(function() {
+		var fieldValue = $(this).val();
+		if (isNaN(fieldValue)) {
+			alert("Please supply a number");
+			}
+	}); //end blur
+
+	$("#search").focus(function() {
+		$(this).keyup(function() {
+			var valueSearch = $(this).val().trim();
+
+			if (valueSearch=="") {
+				$("tbody tr").show();
+
+			} else {
+				valueArray = valueSearch.split(" ");
+
+				$("tbody tr").hide();
+				for (var i=0;i<valueArray.length;i++) {
+					$("tbody tr").each(function() {
+					$(this).find("td").each(function() {
+						if ($(this).text().toLowerCase().includes(valueArray[i].toLowerCase())) {
+							$(this).parent().show();
+						}
+					}); //end each
+				}); // end each
+				} // end for
+
+			} // end if
+			
+		}); // end keyup
+	}); //end focus
+	
 });// end ready
 	
-
 </script>
 
 {% endblock %}

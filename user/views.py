@@ -147,22 +147,27 @@ def profile(request):
         roles = "PVS staff"
     elif user.is_provider:
         roles = "Provider"
+    list_device = ManageDevice.objects.filter(user=user)
     if request.method == "POST":
         form = ProviderChangeForm(request.POST,user=request.user)
         form_add = AddDeviceForm(request.POST,user=request.user)
         if form_add.is_valid():
             form_add.save()
             return redirect("user:profile")
+        
+
+ 
         elif form.is_valid():
             form.save()
             return redirect("user:profile")
+
         
         
     else:
         form = ProviderChangeForm()
         form_add = AddDeviceForm()
-        list_device = ManageDevice.objects.filter(user=user)
-        return render(request,"user/profile.html",{"form":form,"form_add":form_add,"user":user,"roles":roles,"list_device":list_device})
+        
+    return render(request,"user/profile.html",{"form":form,"form_add":form_add,"user":user,"roles":roles,"list_device":list_device})
 
 
 

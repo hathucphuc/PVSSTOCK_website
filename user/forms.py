@@ -4,8 +4,9 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.db import transaction
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldError, ObjectDoesNotExist
 from django.utils.text import slugify
+from django.shortcuts import get_object_or_404
 
 from .utils import ActivationMailFormMixin
 from .models import Provider
@@ -113,8 +114,11 @@ class ProviderChangeForm(forms.Form):
     class Meta():
         fields = ("name","full_name","email","phone","url")
 
+    
+
     def clean_name(self):
         name = self.cleaned_data["name"]
+        
         disallowed = (
             'activate',
             'create',
@@ -127,9 +131,9 @@ class ProviderChangeForm(forms.Form):
         if name in disallowed:
             raise ValidationError("A user with that name already exists.")
         try:
-            user = Provider.objects.get(name=name)
+            Provider.objects.get(name=name)
             raise ValidationError("A user with that name already exists.")
-        except:
+        except (FieldError, ValueError, ObjectDoesNotExist):               
             return name
         
 
@@ -146,10 +150,11 @@ class ProviderChangeForm(forms.Form):
         )
         if full_name in disallowed:
             raise ValidationError("A user with that full name already exists.")
+
         try:
-            user = Provider.objects.get(full_name=full_name)
-            raise ValidationError("A user with that full name already exists.")
-        except:
+            Provider.objects.get(full_name=full_name)
+            raise ValidationError("A full name with that name already exists.")
+        except(FieldError, ValueError, ObjectDoesNotExist):               
             return full_name
         
 
@@ -157,26 +162,34 @@ class ProviderChangeForm(forms.Form):
         email = self.cleaned_data["email"]
         User = get_user_model()
         try:
-            user = User.objects.get(email=email)
-            raise ValidationError("A user with that email already exists.")
-        except:
+            User.objects.get(email=email)
+            raise ValidationError("A email with that name already exists.")
+        except(FieldError, ValueError, ObjectDoesNotExist):               
             return email
 
     def clean_phone(self):
         phone = self.cleaned_data["phone"]
         try:
-            user = Provider.objects.get(phone=phone)
-            raise ValidationError("A user with that phone already exists.")
-        except:
+            Provider.objects.get(phone=phone)
+            raise ValidationError("A phone with that name already exists.")
+        except(FieldError, ValueError, ObjectDoesNotExist):               
             return phone
 
     def clean_url(self):
         url = self.cleaned_data["url"]
         try:
-            user = Provider.objects.get(url=url)
-            raise ValidationError("A user with that url website already exists.")
-        except:
+            Provider.objects.get(url=url)
+            raise ValidationError("A url with that name already exists.")
+        except(FieldError, ValueError, ObjectDoesNotExist):               
             return url
+    
+    def clean(self):
+        if not self.cleaned_data.get("name") and not self.cleaned_data.get("full_name") and not self.cleaned_data.get("email") and not self.cleaned_data.get("phone") and not self.cleaned_data.get("url"):
+            
+            raise ValidationError("All fields are blank!!!")
+        return self.cleaned_data
+
+
     def save(self):
         user = self.user
         provider = Provider.objects.get(user=user)

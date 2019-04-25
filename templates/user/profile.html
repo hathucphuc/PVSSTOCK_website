@@ -98,43 +98,71 @@
 				      </ul>
 				    {% endif %}
 					<div class="form-group row">
-						<label for="" class="col-sm-3 col-form-label">Name</label>
+						<label for="name" class="col-sm-3 col-form-label">Name</label>
 						{% if form.name.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form.name.value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form.name.value}}" id="name"></div>
 						{% else %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="name"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" id="name"></div>
 						{% endif %}
 					</div>
+					{% if form.full_name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.full_name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
 					<div class="form-group row">
-						<label for="" class="col-sm-3 col-form-label">Full Name</label>
+						<label for="full_name" class="col-sm-3 col-form-label">Full Name</label>
 						{% if form.full_name.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" value="{{form.full_name.value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" value="{{form.full_name.value}}" id="full_name"></div>
 						{% else %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="full_name"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" id="full_name"></div>
 						{% endif %}
 					</div>
+					{% if form.email.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.email.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
 					<div class="form-group row">
 						<label for="" class="col-sm-3 col-form-label">Email</label>
 						{% if form.email.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="email" value="{{form.email.value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" value="{{form.email.value}}" id="email"></div>
 						{% else %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="email" ></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" id="email"></div>
 						{% endif %}
 					</div>
+					{% if form.phone.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.phone.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
 					<div class="form-group row">
-						<label for="" class="col-sm-3 col-form-label">Phone</label>
+						<label for="phone" class="col-sm-3 col-form-label">Phone</label>
 						{% if form.phone.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="phone" value="{{form.phone.value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone" value="{{form.phone.value}}" id="phone"></div>
 						{% else %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="phone"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone" id="phone"></div>
 						{% endif %}
 					</div>
+					{% if form.url.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.url.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
 					<div class="form-group row">
-						<label for="" class="col-sm-3 col-form-label">Website Link</label>
+						<label for="url" class="col-sm-3 col-form-label">Website Link</label>
 						{% if form.url.value %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="url" value="{{form.url.value}}"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="url" value="{{form.url.value}}" id="url"></div>
 						{% else %}
-						<div class="col-sm-9"><input type="text" class="form-control" name="url"></div>
+						<div class="col-sm-9"><input type="text" class="form-control" name="url" id="url"></div>
 						{% endif %}
 					</div>
 					
@@ -169,6 +197,13 @@
 							<div class="col-sm-9"><input type="text" class="form-control" name="brand" id="brand" required pattern="\S+"></div>
 							{% endif %}
 						</div>
+						{% if form_add.model.errors %}
+					      <ul class="custom_error_list">
+					        {% for error in form_add.model.errors %}
+					          <li><em>{{ error }}</em></li>
+					        {% endfor %}
+					      </ul>
+					    {% endif %}
 						<div class="form-group row">
 							<label for="" class="col-sm-3 col-form-label">Model<span class="required">*</span></label>
 							{% if form_add.model.value %}
@@ -274,6 +309,16 @@ $(document).ready(function() {
 	}); //end click
 
 	$("#change_bt").click(function() {
+		var name = $("#name").val();
+		var full_name = $("#full_name").val();
+		var email = $("#email").val();
+		var phone = $("#phone").val();
+		var url = $("#url").val();
+		if (name==""&&full_name==""&&email==""&&phone==""&&url=="") {
+			alert("Please fill at least one field!");
+			return false;
+		}
+
 		$("#form").submit();
 		
 	}); //end click
@@ -288,7 +333,7 @@ $(document).ready(function() {
 			alert("Please supply a number to quantity field!");
 			return false;
 		}
-		if (brand==""||model==""||description==""||kind==""|quantity=="") {
+		if (brand==""||model==""||description==""||kind==""||quantity=="") {
 			alert("Please fill out all the fields!");
 			return false;
 		}

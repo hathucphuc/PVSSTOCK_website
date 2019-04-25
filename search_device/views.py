@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
-import xlrd, os
+import xlrd, os, re
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 
-from .forms import UploadForm, SearchDeviceForm, AddDeviceForm, FilterForm
+from .forms import UploadForm, SearchDeviceForm, AddDeviceForm, FilterForm, EditDeviceForm
 from .models import ManageDevice
 #from .filters import DeviceFilter
 # Create your views here.
@@ -24,18 +24,15 @@ def import_data(request):
 		if form.is_valid():
 			form.save()
 
-			try:
-				if ManageDevice.objects.filter(user=request.user):
-					ManageDevice.objects.filter(user=request.user).delete()
-			except:
-				pass
+			file_name = request.FILES["file_excel"].name.replace(" ","_")
+			file_name = re.sub(r"[\(\)\<\>\{\}]+","",file_name)
 
-
-			#path = "E:\\OneDrive\\Learning_Pyhton\\GITHUB\\PVSSTOCK_website\\media\\upload_excel\\%s" %(request.FILES["file_excel"].name)
-			path = "/Users/haphuc/onedrive/Learning_Pyhton/GITHUB/PVSSTOCK_website/media/upload_excel/%s" %(request.FILES["file_excel"].name)
+			#path = "E:\\OneDrive\\Learning_Pyhton\\GITHUB\\PVSSTOCK_website\\media\\upload_excel\\%s" %(file_name)
+			#path = "/Users/haphuc/onedrive/Learning_Pyhton/GITHUB/PVSSTOCK_website/media/upload_excel/%s" %(file_name)
+			path = "/home/django_pvsstock/PVSSTOCK_website/media/upload_excel/%s" %(file_name)
 
 			workbook = xlrd.open_workbook(path)
-			os.remove(path)
+
 
 			# number of sheets
 			sheets = workbook.nsheets
@@ -51,14 +48,22 @@ def import_data(request):
 					for c in range(num_columns):
 						row.append(sheet.cell(r,c).value)
 					if type(row[1])==str:
-						model = row[1]
+						model = row[1].upper()
 					else:
 						model = int(row[1])
+					if type(row[4])==str or row[4]==0 or row[4]=="":
+						continue
 					try:
+						device = ManageDevice.objects.get(model=model,user=request.user)
+						device.quantity = int(row[4])
+						device.save()
+						print("successfully")
 
-						ManageDevice.objects.create(brand=row[0],model=model,kind=row[2],description=row[3],quantity=int(row[4]),provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
+						
 					except:
-						return HttpResponse("Your file excel has value of quantity column is a string.")
+						ManageDevice.objects.create(brand=row[0],model=model,kind=row[2],description=row[3],quantity=int(row[4]),provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
+						
+			os.remove(path)
 			
 			return redirect("user:profile")
 	else:
@@ -143,22 +148,23 @@ def search_device(request):
 
 
 def edit_device(request,pk):
-    device = ManageDevice.objects.get(pk=pk)
-    if request.method == "POST":
-        form = AddDeviceForm(request.POST,user=request.user)
-        if form.is_valid():
-            
-            device.brand = form.cleaned_data["brand"]
-            device.model = form.cleaned_data["model"]
-            device.kind = form.cleaned_data["kind"]
-            device.description = form.cleaned_data["description"]
-            device.quantity = form.cleaned_data["quantity"]
-            device.save()
-            return redirect("user:profile")
-    else:
+	device = ManageDevice.objects.get(pk=pk)
+	if request.method == "POST":
+		form = EditDeviceForm(request.POST,user=request.user,pk=pk)
+		if form.is_valid():
 
-        form = AddDeviceForm(initial={"brand":device.brand,"model":device.model,"description":device.description,"kind":device.kind,"quantity":device.quantity})
-        return render(request,"search_device/edit_device.html",{"form":form,"device":device})
+			device.brand = form.cleaned_data["brand"]
+			device.model = form.cleaned_data["model"]
+			device.kind = form.cleaned_data["kind"]
+			device.description = form.cleaned_data["description"]
+			device.quantity = form.cleaned_data["quantity"]
+			device.save()
+			return redirect("user:profile")
+
+	else:
+
+		form = EditDeviceForm(initial={"brand":device.brand,"model":device.model,"description":device.description,"kind":device.kind,"quantity":device.quantity})
+	return render(request,"search_device/edit_device.html",{"form":form,"device":device})
 
 class DeviceDelete(DeleteView):
 	model = ManageDevice

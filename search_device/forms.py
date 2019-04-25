@@ -1,6 +1,7 @@
 from django import forms
+from django.http import HttpResponse
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldError, ObjectDoesNotExist
 
 from .models import UploadExcel, ManageDevice
 
@@ -35,26 +36,57 @@ class SearchDeviceForm(forms.Form):
 
 class AddDeviceForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-         self.user = kwargs.pop('user',None)
-         super(AddDeviceForm, self).__init__(*args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		self.user = kwargs.pop('user',None)
+		super(AddDeviceForm, self).__init__(*args, **kwargs)
 
-    class Meta:
-        model = ManageDevice
-        fields = ["brand","model","description","kind","quantity",]
+	class Meta:
+		model = ManageDevice
+		fields = ["brand","model","description","kind","quantity",]
 
-    
+	def clean_model(self):
+		model = self.cleaned_data["model"].upper()
+		
+		user = self.user
+		
+		try:
+			ManageDevice.objects.get(model=model,user=user)		
+			raise ValidationError("A device with model already exists.")
+		except(FieldError, ValueError, ObjectDoesNotExist):
+			
+			return model
+    	
 
-    def save(self,**kwargs):
-        new = super().save(commit=False)
-        user=self.user
-        #new = ManageDevice.objects.create(brand=self.cleaned_data["brand"],model=self.cleaned_data["model"],description=self.cleaned_data["description"],kind=self.cleaned_data["kind"],quantity=self.cleaned_data["quantity"],provider=user.provider.name,phone=user.provider.phone,user=user)
-        
-        new.user = user
-        new.provider = user.provider.name
-        new.phone = user.provider.phone
-        new.save()
-        return new
+	def save(self,**kwargs):
+		new = super().save(commit=False)
+		user=self.user
+	    
+		new.user = user
+		new.provider = user.provider.name
+		new.phone = user.provider.phone
+		new.save()
+		print("save")
+		return new
+
+class EditDeviceForm(AddDeviceForm):
+	def __init__(self, *args, **kwargs):
+		self.pk = kwargs.pop('pk',None)
+		super(EditDeviceForm, self).__init__(*args, **kwargs)
+
+	def clean_model(self):
+		model = self.cleaned_data["model"].upper()
+		pk = self.pk
+		user = self.user
+		device = ManageDevice.objects.get(pk=pk)
+		if device.model == model:
+			return model
+		else:
+			try:
+				ManageDevice.objects.get(user=user,model=model)
+				raise ValidationError("A device with model already exists.")
+			except(FieldError, ValueError, ObjectDoesNotExist):
+			
+				return model
 
 class FilterForm(forms.Form):
 	brand = forms.CharField(required=False)

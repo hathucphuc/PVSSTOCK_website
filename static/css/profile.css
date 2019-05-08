@@ -86,13 +86,16 @@
     padding: 15px 15px 15px 15px;
     display: none;
 }
-#add_bt {
+#add_bt, #add_store_bt {
     float: right;
     margin-bottom: 18px;
     background-color: #1E90FF;
     color:white;
 }
 
+#add_bt {
+    margin-top: -15px;
+}
 /* search bar */
 
 .search_input{
@@ -105,5 +108,17 @@
     border-radius: 0 25px 25px 0;
     }
 
+.icon{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
 
-
+.fa-envelope{
+    font-size: 35px;
+    color: Dodgerblue;
+}
+.fa-skype{
+    font-size: 35px;
+    color: Dodgerblue;
+}

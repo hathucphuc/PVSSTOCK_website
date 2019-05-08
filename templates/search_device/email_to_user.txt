@@ -1,0 +1,16 @@
+Hi,
+
+We have received your request quotation.
+
+This is device information:
+
+-Model: {{form.device.model}}
+-Brand: {{form.device.brand}}
+-Kind: {{form.device.kind}}
+-Description: {{form.device.description}}
+-Quantity: {{form.quantity}}
+-Vendor: {{form.device.user.provider.name}}
+
+The Vendor will contact to you for detail soon.
+
+Thank you!

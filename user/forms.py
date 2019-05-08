@@ -106,13 +106,15 @@ class ProviderChangeForm(forms.Form):
     email = forms.EmailField(required=False)
     phone = forms.CharField(required=False)
     url = forms.URLField(required=False)
+    skype_name = forms.CharField(required=False)
+    zalo_link = forms.URLField(required=False)
 
     def __init__(self, *args, **kwargs):
          self.user = kwargs.pop('user',None)
          super(ProviderChangeForm, self).__init__(*args, **kwargs)
 
     class Meta():
-        fields = ("name","full_name","email","phone","url")
+        fields = ("name","full_name","email","phone","url","skype_name","zalo_link")
 
     
 
@@ -133,7 +135,8 @@ class ProviderChangeForm(forms.Form):
         try:
             Provider.objects.get(name=name)
             raise ValidationError("A user with that name already exists.")
-        except (FieldError, ValueError, ObjectDoesNotExist):               
+        except (FieldError, ValueError, Provider.DoesNotExist):
+            print("name")           
             return name
         
 
@@ -154,7 +157,8 @@ class ProviderChangeForm(forms.Form):
         try:
             Provider.objects.get(full_name=full_name)
             raise ValidationError("A full name with that name already exists.")
-        except(FieldError, ValueError, ObjectDoesNotExist):               
+        except(FieldError, ValueError, ObjectDoesNotExist):
+            print("full_name")            
             return full_name
         
 
@@ -164,7 +168,8 @@ class ProviderChangeForm(forms.Form):
         try:
             User.objects.get(email=email)
             raise ValidationError("A email with that name already exists.")
-        except(FieldError, ValueError, ObjectDoesNotExist):               
+        except(FieldError, ValueError, ObjectDoesNotExist):
+            print("email")             
             return email
 
     def clean_phone(self):
@@ -172,7 +177,8 @@ class ProviderChangeForm(forms.Form):
         try:
             Provider.objects.get(phone=phone)
             raise ValidationError("A phone with that name already exists.")
-        except(FieldError, ValueError, ObjectDoesNotExist):               
+        except(FieldError, ValueError, ObjectDoesNotExist):
+            print("phone")              
             return phone
 
     def clean_url(self):
@@ -180,13 +186,45 @@ class ProviderChangeForm(forms.Form):
         try:
             Provider.objects.get(url=url)
             raise ValidationError("A url with that name already exists.")
-        except(FieldError, ValueError, ObjectDoesNotExist):               
+        except(FieldError, ValueError, ObjectDoesNotExist):
+            print("url")               
             return url
+
+    def clean_skype_name(self):
+        skype_name = self.cleaned_data["skype_name"]
+        if skype_name!="":
+
+            try:
+                print("skpye_f")
+                Provider.objects.get(skype_name=skype_name)
+                print("skype_a")
+                raise ValidationError("A name skype with that name already exists.")
+            except(FieldError, ValueError, ObjectDoesNotExist):
+                print("skype_name")             
+                return skype_name
+        else:
+            return skype_name
+
+    def clean_zalo_link(self):
+        zalo_link = self.cleaned_data["zalo_link"]
+        print("zalo")
+        if zalo_link!="":
+            try:
+                print("zalo_a")
+                Provider.objects.get(zalo_link=zalo_link)
+                print("zalo_a")
+                raise ValidationError("A link zalo with that link already exists.")
+            except(FieldError, ValueError, ObjectDoesNotExist):
+                print("zalo_link")               
+                return zalo_link
+        else:
+            return zalo_link
     
     def clean(self):
-        if not self.cleaned_data.get("name") and not self.cleaned_data.get("full_name") and not self.cleaned_data.get("email") and not self.cleaned_data.get("phone") and not self.cleaned_data.get("url"):
-            
+        if not self.cleaned_data.get("name") and not self.cleaned_data.get("full_name") and not self.cleaned_data.get("email") and not self.cleaned_data.get("phone") and not self.cleaned_data.get("skype_name") and not self.cleaned_data.get("zalo_link") and not self.cleaned_data.get("url"):
+            print("worng")
             raise ValidationError("All fields are blank!!!")
+        print("clean")
         return self.cleaned_data
 
 
@@ -203,6 +241,11 @@ class ProviderChangeForm(forms.Form):
             ManageDevice.objects.filter(user=user).update(phone=self.cleaned_data['phone'])
         if self.cleaned_data["url"]:
             provider.url = self.cleaned_data['url']
+        if self.cleaned_data["skype_name"]:
+            print("123")
+            provider.skype_name = self.cleaned_data["skype_name"]
+        if self.cleaned_data["zalo_link"]:
+            provider.zalo_link = self.cleaned_data["zalo_link"]
         provider.save()
 
         if self.cleaned_data["email"]:

@@ -27,7 +27,7 @@ from django.views.generic import View
 from .utils import MailContextViewMixin
 from .forms import (
     ResendActivationEmailForm, ProviderSignUpForm, ProviderChangeForm)
-from search_device.forms import AddDeviceForm
+from search_device.forms import AddDeviceForm, AddStoreForm
 from search_device.models import ManageDevice
 
 
@@ -151,7 +151,9 @@ def profile(request):
     if request.method == "POST":
         form = ProviderChangeForm(request.POST,user=request.user)
         form_add = AddDeviceForm(request.POST,user=request.user)
+        form_add_store = AddStoreForm()
         if form_add.is_valid():
+            print("form_add")
             form_add.save()
             return redirect("user:profile")
         
@@ -159,15 +161,18 @@ def profile(request):
  
         elif form.is_valid():
             form.save()
+            print("456")
             return redirect("user:profile")
 
         
         
     else:
         form = ProviderChangeForm()
-        form_add = AddDeviceForm()
+        form_add = AddDeviceForm(user=user)
+        form_add_store = AddStoreForm()
         
-    return render(request,"user/profile.html",{"form":form,"form_add":form_add,"user":user,"roles":roles,"list_device":list_device})
+    return render(request,"user/profile.html",{"form":form,"form_add":form_add,"form_add_store":form_add_store,"user":user,"roles":roles,"list_device":list_device})
+
 
 
 

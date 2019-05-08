@@ -1,0 +1,123 @@
+{% load staticfiles %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+
+	<title>Request Quotation</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.4.0/js/bootstrap4-toggle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/request_quota.css' %}">
+</head>
+<body>
+<section>
+	<div class="quotation">
+		<h1>Form Quotation</h1>
+		<div class="quotation__info row">
+			
+			<div class="col-6 quotation__info-header">Brand</div>
+			<div class="col-6 quotation__info-body">{{device.brand}}</div>
+			<div class="col-6 quotation__info-header">Model</div>
+			<div class="col-6 quotation__info-body">{{device.model}}</div>
+			<div class="col-6 quotation__info-header">Kind</div>
+			<div class="col-6 quotation__info-body">{{device.kind}}</div>
+			<div class="col-6 quotation__info-header">Description</div>
+			<div class="col-6 quotation__info-body">{{device.description}}</div>
+			<div class="col-6 quotation__info-header">Provider</div>
+			<div class="col-6 quotation__info-body">{{device.provider}}</div>
+
+		</div>
+		<form action="{{device.get_absolute_url}}" class="quotation__form" method="post" id="form">
+			{% csrf_token %}
+			{% if form.company_name.errors %}
+		      <ul class="custom_error_list">
+		        {% for error in form.company_name.errors %}
+		          <li><em>{{ error }}</em></li>
+		        {% endfor %}
+		      </ul>
+			{% endif %}
+			<p for="">Your Company<span>*</span></p>
+			{% if form.company_name.value %}
+			<input type="text" id="company_name" placeholder="Name Company" name="company_name" value="{{form.company_name.value}}" required>
+			{% else %}
+			<input type="text" id="company_name" placeholder="Name Company" name="company_name" required>
+			{% endif %}
+			{% if form.email.errors %}
+		      <ul class="custom_error_list">
+		        {% for error in form.email.errors %}
+		          <li><em>{{ error }}</em></li>
+		        {% endfor %}
+		      </ul>
+			{% endif %}
+			<p for="">Email<span>*</span></p>
+			{% if form.email.value %}
+			<input type="text" id="email" placeholder="Email" value="{{form.email.value}}" name="email" required>
+			{% else %}
+			<input type="text" id="email" placeholder="Email" name="email" required>
+			{% endif %}
+			{% if form.phone.errors %}
+		      <ul class="custom_error_list">
+		        {% for error in form.phone.errors %}
+		          <li><em>{{ error }}</em></li>
+		        {% endfor %}
+		      </ul>
+			{% endif %}
+			<p for="">Phone<span>*</span></p>
+			{% if form.phone.value %}
+			<input type="text" id="phone" placeholder="Phone number" value="{{form.phone.value}}" name="phone" required>
+			{% else %}
+			<input type="text" id="phone" placeholder="Phone number" name="phone" required>
+			{% endif %}
+			{% if form.quantity.errors %}
+		      <ul class="custom_error_list">
+		        {% for error in form.quantity.errors %}
+		          <li><em>{{ error }}</em></li>
+		        {% endfor %}
+		      </ul>
+			{% endif %}
+			<p for="">Quantity<span>*</span></p>
+			{% if form.quantity.value %}
+			<input type="text" id="quantity" placeholder="Quantity" value="{{form.quantity.value}}" name="quantity" required>
+			{% else %}
+			<input type="text" id="quantity" placeholder="Quantity" name="quantity" required>
+			{% endif %}
+			<div class="button">
+				<button class="btn btn-primary" type="button" id="sub_bt">Send</button>
+			</div>
+		</form>
+	</div>
+</section>
+<footer>
+	<div class="container">
+		<div class="footer">
+			<p>Copyright &copy; PVS Website 2019</p>
+		</div>
+		
+	</div>
+</footer>
+<script>
+$(document).ready(function() {
+	$("#sub_bt").click(function() {
+		var company_name = $("#company_name").val();
+		var email = $("#email").val();
+		var phone = $("#phone").val();
+		var quantity = $("#quantity").val();
+		if (isNaN(quantity)) {
+			alert("Please supple a number to quantity field!");
+			return false;
+		}
+
+		$("#form").submit();
+	}); //end click
+}); //end ready
+</script>
+</body>
+</html>

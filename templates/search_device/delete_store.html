@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{block.super}} - Delete Store
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container" style="margin-top:200px;">
+	<form action="{{store.get_delete_url}}" method="post" style="text-align:center;">
+		{% csrf_token %}
+		<h5>Are you sure want to delete <b>{{store.name}}</b>?</h5>
+		<div style="padding-left:200px;">
+			<a href="{% url 'user:profile' %}" style="padding-right:50px;"><button type="button" class="btn btn-secondary" >Cancel</button></a>
+			<button type="submit" class="btn btn-danger">Delete</button>
+		</div>
+		
+	</form>
+</div>
+
+
+{% endblock %}

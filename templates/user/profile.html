@@ -15,20 +15,43 @@
 				<h6>{{roles}}</h6>
 				<ul class="nav nav-tabs" href="#about">
 					<li class="nav-item">
-						<a class="nav-link active" id="about-tab" href="#about">About</a>
+						<a class="nav-link" id="about-tab" href="#about">About</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="#edit" id="edit-tab">Edit</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#device" id="device-tab">Devices</a>
+						<a class="nav-link active" href="#device" id="device-tab">Devices</a>
 					</li>
 				</ul>
 			</div>
 		</div>
 		<div class="col-md-2">
-			<a href="{% url 'user:pw_change' %}"><button class="btn btn-secondary" type="button" style="margin-bottom:30px;">Change Password				
-			</button></a>
+			<div class="dropdown" style="margin-bottom:30px;float:right">
+				<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" data-flip="false" aria-haspopup="true" aria-expanded="true">Add Store</button>
+			<div class="dropdown-menu dropdown-menu-right" style="width:400px;">
+			  <form action="{% url 'add_store' %}" class="px-3 py-3" id="add_store" method="post">
+			  	{% csrf_token %}
+			  	<div class="form-group">
+			      <label for="name_store">Name</label>
+			      {% if form_add_store.name.value %}
+			      <input type="text" class="form-control" id="name_store" name="name" value="{{form_add_store.name.value}}">
+			      {% else %}
+			      <input type="text" class="form-control" id="name_store" name="name">
+			      {% endif %}
+			    </div>
+			    <div class="form-group">
+			      <label for="address">Address</label>
+			      {% if form_add_store.address.value %}
+			      <input type="text" class="form-control" id="address" name="address" value="{{form_add_store.address.value}}">
+			      {% else %}
+			      <input type="text" name="address" class="form-control" id="address">
+			      {% endif %}
+			    </div>
+			    <button type="button" class="btn" id="add_store_bt">Add</button>
+			  </form>
+			</div>
+			</div>
 		</div>
 		
 	</div>
@@ -36,7 +59,7 @@
 	<div class="row justify-content-center" >
 		<div class="col-md-8">
 			<div class="tab-content profile-tab">
-			<div class="tab-pane fade show active" id="about">
+			<div class="tab-pane fade" id="about">
 			<div class="row">
 				<div class="col-md-6"><label for="">
 					User Id
@@ -85,6 +108,40 @@
 					<p>{{user.provider.url}}</p>
 				</div>
 			</div>
+			{%if user.provider.skype_name %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Skype Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.skype_name}}</p>
+				</div>
+			</div>
+			{% endif %}
+			{%if user.provider.zalo_link %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Zalo Link
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.zalo_link}}</p>
+				</div>
+			</div>
+			{% endif %}
+			{% if user.store_set.all %}
+			<hr noshade>
+			
+			{% for store in user.store_set.all %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					<a href="{{store.get_delete_url}}">{{store.name}}</a>
+				</label></div>
+				<div class="col-md-6">
+					<p>{{store.address}}</p>
+				</div>
+			</div>
+			{% endfor %}
+			{% endif %}
 			</div>
 
 			<div class="tab-pane fade" id="edit">
@@ -165,21 +222,71 @@
 						<div class="col-sm-9"><input type="text" class="form-control" name="url" id="url"></div>
 						{% endif %}
 					</div>
+					{% if form.skype_name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.skype_name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="skype_name" class="col-sm-3 col-form-label">Skype Name</label>
+						{% if form.skype_name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="skype_name" value="{{form.skype_name.value}}" id="skype_name"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="skype_name" id="skype_name"></div>
+						{% endif %}
+					</div>
+					{% if form.zalo_link.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.zalo_link.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="zalo_link" class="col-sm-3 col-form-label">Zalo Link</label>
+						{% if form.zalo_link.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="zalo_link" value="{{form.zalo_link.value}}" id="zalo_link"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="zalo_link" id="zalo_link"></div>
+						{% endif %}
+					</div>
 					
 					<p style="font-size:0.8em;color:red;"><i>( * just fill out the fields which you want to change infomation.)</i></p>
+					<a href="{% url 'user:pw_change' %}"><button class="btn btn-secondary" type="button" style="margin-bottom:30px;float:left;">Password</button></a>
 					<button class="btn btn-success" type="button" style="float:right;" id="change_bt">Confirm</button>
 				</form>
 
 			</div>
-			<div class="tab-pane fade" id="device">
+			<div class="tab-pane fade  show active" id="device">
 				<div class="row justify-content-center">
-					<div class="col-10">
+					<div class="col-4">
 					<div class="input-group" style="width:100%">
 						<input type="text" name="" placeholder="Search..." class="search_input" id="search">
 						<div class="input-group-append">
 						<button class="btn btn-light search_icon" disabled><i class="fa fa-search"></i></button>
 						</div>
 					</div>
+					</div>
+					<div class="col-3">
+						<span>Status</span>
+						<select  id="public">
+							<option value="">All</option>
+							<option value="">Public</option>
+							<option value="">Private</option>
+						</select>
+					</div>
+					<div class="col-3">
+						<span>Store</span>
+						<select id="store">
+							<option value="">All</option>
+							{% if form_add.store.field.choices %}
+							{% for value, name in form_add.store.field.choices %}
+							<option value="">{{name}}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
 					</div>
 					<div class="col-2">
 						<p id="open">Add</p>
@@ -220,6 +327,17 @@
 							<div class="col-sm-9"><input type="text" class="form-control" name="description" required pattern="\S+" id="description"></div>
 							{% endif %}
 						</div>
+			
+						{% if form_add.store.field.choices %}
+						{% for value, label in form_add.store.field.choices %}
+						<div class="form-check form-check-inline" style="margin-bottom:10px;">
+							<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{value}}" name="store">
+  							<label class="form-check-label" for="inlineCheckbox1">{{label}}</label>
+
+						</div>
+						{% endfor %}
+						{% endif %}
+
 						<div class="row">
 							<div class="col-sm-6">
 								<div class="form-group row">
@@ -241,6 +359,11 @@
 									{% endif %}
 								</div>
 							</div>
+						</div>
+						<div class="form-check">
+							<input name="public" type="checkbox" checked class="form-check-input" >
+							<label class="form-check-label">Public</label>
+							
 						</div>
 						<button class="btn" type="button" id="add_bt">Add</button>
 					</form>
@@ -266,6 +389,16 @@
 				    		<td>{{device.kind}}</td>
 				    		<td>{{device.description}}</td>
 				    		<td>{{device.quantity}}</td>
+				    		{% if device.public %}
+				    		<td>Public</td>
+				    		{% else %}
+				    		<td>Private</td>
+				    		{% endif %}
+				    		{% if device.store.all %}
+				    		{% for store in device.store.all %}
+				    		<td>{{store.name}}</td>
+				    		{% endfor %}
+				    		{% endif %}
 
 				    	</tr>
 				    </tbody>
@@ -287,6 +420,7 @@
 </div>
 <script>
 $(document).ready(function() {
+	// navigate tab //
 	$(".nav-link").click(function() {
 		if ($(this).hasClass("active")) {
 			return false;
@@ -300,6 +434,8 @@ $(document).ready(function() {
 		} // end if			
 
 	});// end click
+
+	// Open popup form add device //
 	$("#open").click(function() {
 		
 		$("#add form").stop().slideToggle();
@@ -308,13 +444,16 @@ $(document).ready(function() {
 		$(this).toggleClass("closed");
 	}); //end click
 
+	// Change Information Profile //
 	$("#change_bt").click(function() {
 		var name = $("#name").val();
 		var full_name = $("#full_name").val();
 		var email = $("#email").val();
 		var phone = $("#phone").val();
 		var url = $("#url").val();
-		if (name==""&&full_name==""&&email==""&&phone==""&&url=="") {
+		var skype_name = $("#skype_name").val();
+		var zalo_link = $("#zalo_link").val();
+		if (name==""&&full_name==""&&email==""&&phone==""&&url==""&&skype_name==""&&zalo_link=="") {
 			alert("Please fill at least one field!");
 			return false;
 		}
@@ -322,6 +461,20 @@ $(document).ready(function() {
 		$("#form").submit();
 		
 	}); //end click
+
+	// Add Store //
+	$("#add_store_bt").click(function() {
+		var name_store = $("#name_store").val().trim();
+		var address = $("#address").val().trim();
+
+		if (name_store==""||address=="") {
+			return false;
+		}
+
+		$("#add_store").submit();
+	}); // end click
+
+	// Add Device //
 	$("#add_bt").click(function() {
 
 		var quantity = $("#quantity").val();
@@ -338,9 +491,10 @@ $(document).ready(function() {
 			return false;
 		}
 
-		$("#form_add").submit(
-		);// end submit
+		$("#form_add").submit();// end submit
 	}); // end click
+
+	// alert when customer fill value is not number //
 	$("#quantity").blur(function() {
 		var fieldValue = $(this).val();
 		if (isNaN(fieldValue)) {
@@ -348,31 +502,118 @@ $(document).ready(function() {
 			}
 	}); //end blur
 
-	$("#search").focus(function() {
-		$(this).keyup(function() {
-			var valueSearch = $(this).val().trim();
+	// seach bar //
 
-			if (valueSearch=="") {
-				$("tbody tr").show();
+	var store = $("#store option:selected").text();
+	var public = $("#public option:selected").text();
+	var all_device = $("tbody tr");
+	var all_device_field = $("tbody tr td");
+	all_device_field.hide();
+	function showDevice(device) {
+		device.each(function() {
+			$(this).find("td").slice(0,5).show();
+		});
+	}
 
-			} else {
-				valueArray = valueSearch.split(" ");
+	function search(show,devices) {
+		$("#search").focus(function() {
+			$(this).keyup(function() {
+				var valueSearch = $(this).val().trim();
 
-				$("tbody tr").hide();
-				for (var i=0;i<valueArray.length;i++) {
-					$("tbody tr").each(function() {
-					$(this).find("td").each(function() {
-						if ($(this).text().toLowerCase().includes(valueArray[i].toLowerCase())) {
-							$(this).parent().show();
-						}
-					}); //end each
+				if (valueSearch=="") {
+					show;
+
+				} else {
+					valueArray = valueSearch.split(" ");
+
+					all_device_field.hide();
+					for (var i=0;i<valueArray.length;i++) {
+						devices.each(function() {
+						$(this).find("td").each(function() {
+							if ($(this).text().toLowerCase().includes(valueArray[i].toLowerCase())) {
+								showDevice($(this).parent());
+								return false;
+							}
+						}); //end each
+					}); // end each
+					} // end for
+
+				} // end if
+				
+			}); // end keyup
+		}); //end focus
+	}
+
+	showDevice(all_device);
+	
+	$("#store,#public").change(function() {
+	var store = $("#store option:selected").text();
+	var public = $("#public option:selected").text();
+	var get_device = $();
+	all_device_field.hide();
+
+	if (store=="All"&&public=="All") {
+		showDevice(all_device);
+		search(showDevice(all_device),all_device);
+
+	} else if (store!="All") {
+		
+		if (public=="All") {
+			all_device.each(function() {
+				$(this).find("td").slice(6).each(function() {
+					if ($(this).text()==store) {
+						showDevice($(this).parent());
+						get_device = get_device.add($(this).parent());
+					}
 				}); // end each
-				} // end for
-
-			} // end if
-			
-		}); // end keyup
-	}); //end focus
+			}); // end each
+			search(showDevice(get_device),get_device);
+		} else if (public=="Public") {
+			all_device.each(function() {
+				if ($(this).find("td").eq(5).text()=="Public") {
+					$(this).find("td").slice(6).each(function() {
+					if ($(this).text()==store) {
+						showDevice($(this).parent());
+						get_device = get_device.add($(this).parent());
+					}
+				}); // end each
+				}
+			}); // end each
+			search(showDevice(get_device),get_device);
+		} else {
+			all_device.each(function() {
+				if ($(this).find("td").eq(5).text()=="Private") {
+					$(this).find("td").slice(6).each(function() {
+					if ($(this).text()==store) {
+						showDevice($(this).parent());
+						get_device = get_device.add($(this).parent());
+					}
+				}); // end each
+				}
+			}); // end each
+			search(showDevice(get_device),get_device);
+		}
+	} else {
+		
+		if (public=="Public") {
+			all_device.each(function() {
+				if ($(this).find("td").eq(5).text()=="Public") {		
+						showDevice($(this).parent());
+						get_device = get_device.add($(this).parent());
+					}
+			}); // end each
+			search(showDevice(get_device),get_device);
+		} else {
+			all_device.each(function() {
+				if ($(this).find("td").eq(5).text()=="Private") {		
+						showDevice($(this).parent());
+						get_device = get_device.add($(this).parent());
+					}
+			}); // end each
+			search(showDevice(get_device),get_device);
+		}
+	}
+	}); // end change
 	
 });// end ready
 	

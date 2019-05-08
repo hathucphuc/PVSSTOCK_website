@@ -6,9 +6,11 @@ from django.db.models import Q
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
 from django.http import HttpResponse
+from django.core.mail import EmailMessage, send_mail, get_connection
+from django.template.loader import get_template
 
-from .forms import UploadForm, SearchDeviceForm, AddDeviceForm, FilterForm, EditDeviceForm
-from .models import ManageDevice
+from .forms import UploadForm, SearchDeviceForm, AddDeviceForm, FilterForm, EditDeviceForm, AddStoreForm, RequestQuotaForm
+from .models import ManageDevice, Store, UploadExcel
 #from .filters import DeviceFilter
 # Create your views here.
 
@@ -20,9 +22,14 @@ def index(request):
 @login_required
 def import_data(request):
 	if request.method == "POST":
-		form = UploadForm(request.POST,request.FILES)
+		print("post")
+		form = UploadForm(request.POST,request.FILES,user=request.user)
 		if form.is_valid():
-			form.save()
+			file = UploadExcel(file_excel=request.FILES['file_excel'])
+			file.save()
+
+			status = form.cleaned_data["public"]
+			stores = form.cleaned_data["store"]
 
 			file_name = request.FILES["file_excel"].name.replace(" ","_")
 			file_name = re.sub(r"[\(\)\<\>\{\}]+","",file_name)
@@ -55,19 +62,26 @@ def import_data(request):
 						continue
 					try:
 						device = ManageDevice.objects.get(model=model,user=request.user)
+						for store in device.store.all():
+							device.store.remove(store)
+						for store in stores:
+							device.store.add(store)
+						device.public = status
 						device.quantity = int(row[4])
 						device.save()
-						print("successfully")
-
 						
 					except:
-						ManageDevice.objects.create(brand=row[0],model=model,kind=row[2],description=row[3],quantity=int(row[4]),provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
+						device=ManageDevice.objects.create(brand=row[0],model=model,kind=row[2],description=row[3],quantity=int(row[4]),provider=request.user.provider.name,phone=request.user.provider.phone,user=request.user)
+						for store in stores:
+							device.store.add(store)
 						
 			os.remove(path)
 			
 			return redirect("user:profile")
+
+		return render(request,"search_device/upload_file_excel.html",{"form":form})
 	else:
-		form = UploadForm()
+		form = UploadForm(user=request.user,initial={"public":True,})
 		return render(request,"search_device/upload_file_excel.html",{"form":form})
 
 					
@@ -86,12 +100,12 @@ def search_device(request):
 			info = info.split()
 
 
-			results = []
+			results = ManageDevice.objects.none()
+			#results = []
 			for i in range(len(info)):
 				result = ManageDevice.objects.filter(Q(brand__icontains=info[i]) | Q(model__icontains=info[i]) | Q(kind__icontains=info[i]) | Q(description__icontains=info[i]) |Q(provider__icontains=info[i]))
-				result = list(result.values_list("brand","model","kind","description","quantity","provider","phone"))
-				results = results + result
-			results = list(set(results))
+
+				results = results.union(result)
 			
 
 			form = SearchDeviceForm(initial={"search":form_result.cleaned_data["search"]})
@@ -128,14 +142,8 @@ def search_device(request):
 			else:
 				provider_set = ManageDevice.objects.all()
 
-			brand_set = set(list(brand_set.values_list("brand","model","kind","description","quantity","provider","phone")))
-			model_set = set(list(model_set.values_list("brand","model","kind","description","quantity","provider","phone")))
-			kind_set = set(list(kind_set.values_list("brand","model","kind","description","quantity","provider","phone")))
-			description_set = set(list(description_set.values_list("brand","model","kind","description","quantity","provider","phone")))
-			provider_set = set(list(provider_set.values_list("brand","model","kind","description","quantity","provider","phone")))
 
-			set_all = brand_set.intersection(model_set).intersection(kind_set).intersection(description_set).intersection(provider_set)
-			results = list(set_all)
+			results = brand_set.intersection(model_set).intersection(kind_set).intersection(description_set).intersection(provider_set)
 
 			
 			form_filter=FilterForm(initial={"brand":brand,"model":model,"description":description,"kind":kind, "provider":provider})
@@ -146,7 +154,7 @@ def search_device(request):
 		form = SearchDeviceForm()
 		return render(request,"search_device/search_device.html",{"form":form,})
 
-
+@login_required
 def edit_device(request,pk):
 	device = ManageDevice.objects.get(pk=pk)
 	if request.method == "POST":
@@ -157,17 +165,71 @@ def edit_device(request,pk):
 			device.model = form.cleaned_data["model"]
 			device.kind = form.cleaned_data["kind"]
 			device.description = form.cleaned_data["description"]
+			device.public = form.cleaned_data["public"]
 			device.quantity = form.cleaned_data["quantity"]
 			device.save()
+
+			for store in device.store.all():
+				device.store.remove(store)
+
+			stores = form.cleaned_data["store"]
+			for store in stores:
+				#st = Store.objects.get(user=request.user,name=store["name"])
+				device.store.add(store)
 			return redirect("user:profile")
 
 	else:
 
-		form = EditDeviceForm(initial={"brand":device.brand,"model":device.model,"description":device.description,"kind":device.kind,"quantity":device.quantity})
+		form = EditDeviceForm(initial={"brand":device.brand,"model":device.model,"description":device.description,"public":device.public,"kind":device.kind,"quantity":device.quantity,"store":[d.pk for d in device.store.all()]},user=request.user)
 	return render(request,"search_device/edit_device.html",{"form":form,"device":device})
 
 class DeviceDelete(DeleteView):
 	model = ManageDevice
 	success_url = reverse_lazy("user:profile")
 	template_name = "search_device/delete_device.html"
-	
+
+@login_required
+def add_store(request):
+	if request.method == "POST":
+		form = AddStoreForm(request.POST,user=request.user)
+		if form.is_valid():
+			form=form.save(commit=False)
+			form.user = request.user
+			form.save()
+			return redirect("user:profile")
+		return HttpResponse("<h1 style='text-align:center;'>Add store failed!</h1>")
+
+class StoreDelete(DeleteView):
+	model = Store
+	success_url = reverse_lazy("user:profile")
+	template_name = "search_device/delete_store.html"
+
+def request_quota(request,pk):
+	device = ManageDevice.objects.get(pk=pk)
+	if request.method == "POST":
+		form = RequestQuotaForm(request.POST)
+		if form.is_valid():
+			
+			form = form.save(commit=False)
+			form.device = device
+			form.save()
+
+			#send email
+			subject = "Email to Vendor"
+			subject1 = "Email to user"
+			from_email = "tech@pvs.com.vn"
+			html_message = get_template("search_device/email_to_vendor.txt").render({"form":form})
+			html_message1 = get_template("search_device/email_to_user.txt").render({"form":form})
+
+			msg = EmailMessage(subject,html_message,from_email,to=[form.device.user.email,])
+			msg.content_type = "html"
+			msg1 = EmailMessage(subject1,html_message1,from_email,to=[form.email,],cc=["support@pvs.com.vn",])
+			msg1.content_type = "html"
+
+			msg.send()
+			msg1.send()
+			return HttpResponse("<h1 style='text-align:center;'>Your request quotation is send successfully!</h1>")
+		return render(request,"search_device/request_quota.html",{"form":form,"device":device,})
+	else:
+		form = RequestQuotaForm()
+		return render(request,"search_device/request_quota.html",{"form":form,"device":device,})

@@ -1,9 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="bootstrap.bundle.min.js"></script>
+	
+</head>
+<body>
+<table>
+	<tr>
+		<td>1</td>
+		<td>2</td>
+		<td>3</td>
+		<td>4</td>
+		<td>5</td>
+		<td>6</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>2</td>
+		<td>3</td>
+		<td>4</td>
+		<td>5</td>
+		<td>6</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>2</td>
+		<td>3</td>
+		<td>4</td>
+		<td>5</td>
+		<td>6</td>
+	</tr>
+	<select  id="se">
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+	</select>
+	<div id="phuc">
+		<div style="display:none;" id="wraper">
+		<a href="https://news.zing.vn/" id="den"><i class="fas fa-envelope"></i></a>
+		</div>
+	</div>
+
+	
+</table>
+
+<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="">Click to toggle popover</button>
 <script>
-	function() {
-			var fieldValue = $("#quantity").val();
-			if (isNaN(fieldValue)) {
-				alert("Please supply a number to quantity field!");
-				return false;
-			} // end if
-		}
-</script>
+$(document).ready(function() {
+
+
+
+$("body").on("click","#den",function(evt) {
+	evt.preventDefault();
+});
+
+$(function () {
+  $('[data-toggle="popover"]').popover({
+  	html : true,
+    content: function() {
+          
+     return $("#wraper").html();
+  }
+});
+}); 
+}); // end ready
+</script>	
+</body>
+</html>

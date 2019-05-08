@@ -1,0 +1,22 @@
+
+<span class="icon-zalo"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></span>
+
+.icon-zalo .path1:before {
+  content: "\e900";
+  color: #e6eff4;
+}
+.icon-zalo .path2:before {
+  content: "\e901";
+  color: #b6d1dd;
+  margin-left: -1em;
+}
+.icon-zalo .path3:before {
+  content: "\e902";
+  color: #41a0d7;
+  margin-left: -1em;
+}
+.icon-zalo .path4:before {
+  content: "\e903";
+  color: #fff;
+  margin-left: -1em;
+}

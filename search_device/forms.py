@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 from django.core.exceptions import ValidationError, FieldError, ObjectDoesNotExist
 
-from .models import UploadExcel, ManageDevice
+from .models import UploadExcel, ManageDevice, Store, RequestQuota
 
 
 
@@ -12,17 +12,25 @@ from .models import UploadExcel, ManageDevice
 
 
 
-class UploadForm(forms.ModelForm):
-	
+class UploadForm(forms.Form):
+	file_excel = forms.FileField()
+	public = forms.BooleanField(help_text='Uncheckbox when you dont want public your devices.')
+
 	class Meta:
-		model = UploadExcel
-		fields = ["file_excel"]
+		fields = ["file_excel","store","public"]
+
+	def __init__(self, *args, **kwargs):
+		self.user = kwargs.pop('user',None)
+		super(UploadForm, self).__init__(*args, **kwargs)
+		self.fields["store"] = forms.ModelMultipleChoiceField(queryset=Store.objects.filter(user=self.user),widget=forms.CheckboxSelectMultiple, required=False, help_text='Choose stores which you want store your devices.')
+		self.fields["public"].required=False
 
 	def clean_file_excel(self):
 		#cleaned_data = super().clean()
 		file_excel = self.cleaned_data.get("file_excel")
 		if file_excel:
 			if file_excel.name.endswith((".xls",".xlsx")):
+				print("excel")
 				return file_excel
 			else:
 				raise ValidationError("The File is not a excel file. Please upload only excel file.")
@@ -36,13 +44,20 @@ class SearchDeviceForm(forms.Form):
 
 class AddDeviceForm(forms.ModelForm):
 
+	class Meta:
+		model = ManageDevice
+		fields = ["brand","model","description","public","kind","quantity","store"]
+		#widgets = {
+           # 'store': forms.CheckboxSelectMultiple,}
+
 	def __init__(self, *args, **kwargs):
 		self.user = kwargs.pop('user',None)
 		super(AddDeviceForm, self).__init__(*args, **kwargs)
+		self.fields["store"] = forms.ModelMultipleChoiceField(queryset=Store.objects.filter(user=self.user),widget=forms.CheckboxSelectMultiple, required=False)
+		self.fields["public"].required=False
 
-	class Meta:
-		model = ManageDevice
-		fields = ["brand","model","description","kind","quantity",]
+
+	#store = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple,queryset=Store.objects.filter(user=self.user))
 
 	def clean_model(self):
 		model = self.cleaned_data["model"].upper()
@@ -65,7 +80,10 @@ class AddDeviceForm(forms.ModelForm):
 		new.provider = user.provider.name
 		new.phone = user.provider.phone
 		new.save()
-		print("save")
+		print("prepair")
+		for store in self.cleaned_data["store"]:
+			print("good!!!")
+			new.store.add(store)
 		return new
 
 class EditDeviceForm(AddDeviceForm):
@@ -97,3 +115,37 @@ class FilterForm(forms.Form):
 
 	class Meta:
 		fields = ["brand","model","description","kind","provider",]
+
+
+class AddStoreForm(forms.ModelForm):
+
+	class Meta:
+		model = Store
+		fields = ["name","address"]
+	def __init__(self, *args, **kwargs):
+		self.user = kwargs.pop('user',None)
+		super(AddStoreForm, self).__init__(*args, **kwargs)
+
+	def clean_name(self):
+		name = self.cleaned_data["name"]
+		
+		user = self.user
+		
+		try:
+			Store.objects.get(name=name,user=user)		
+			raise ValidationError("This name already exists.")
+		except(FieldError, ValueError, ObjectDoesNotExist):
+			
+			return name
+
+class RequestQuotaForm(forms.ModelForm):
+
+	
+	class Meta:
+		model = RequestQuota
+		fields = ["company_name","phone","email","quantity"]
+
+		
+
+
+

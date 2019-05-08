@@ -55,12 +55,14 @@ class User(AbstractBaseUser,PermissionsMixin):
             return self.email
 
 class Provider(models.Model):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-	name = models.CharField(max_length=10,unique=True)
-	full_name = models.CharField(max_length=100,unique=True)
-	phone = models.CharField(max_length=15,unique=True)
-	url = models.URLField(max_length=200,unique=True)
-	slug = models.SlugField(max_length=30,unique=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    name = models.CharField(max_length=10,unique=True)
+    full_name = models.CharField(max_length=100,unique=True)
+    phone = models.CharField(max_length=15,unique=True)
+    url = models.URLField(max_length=200,unique=True)
+    skype_name = models.CharField(max_length=50,unique=True,blank=True,null=True)
+    zalo_link = models.URLField(max_length=200,unique=True,blank=True,null=True)
+    slug = models.SlugField(max_length=30,unique=True)
 
-	def __str__(self):
-		return self.name
+    def __str__(self):
+        return self.name

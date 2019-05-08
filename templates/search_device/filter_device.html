@@ -8,14 +8,14 @@
 
 {% block content %}
 
-<div class="container" style="margin-top:160px;margin-bottom:60px;">
+<div class="container" style="margin-top:140px;margin-bottom:60px;">
 	<form action="{% url 'search_device' %}" method="post" id="form">
     {% csrf_token %}
     <div class="input-group">
       {% if form.search.value %}
-      <input type="text" name="search" value="{{form.search.value}}" class="form-control form-control-lg border-secondary py-2" required pattern="\S+">
+      <input type="text" name="search" value="{{form.search.value}}" class="form-control form-control-lg border-secondary py-2" id="search_value">
       {% else %}
-      <input type="text" name="search" class="form-control form-control-lg border-secondary py-2" placeholder="Search">
+      <input type="text" name="search" class="form-control form-control-lg border-secondary py-2" placeholder="Search" id="search_value">
       {% endif %}
       <div class="input-group-append">
         <button type="button" class="btn btn-warning" id="search"><i class="fa fa-search fa-lg"></i></button>
@@ -83,26 +83,41 @@
 <table class="table table-bordered" style="text-align:center;margin-top:30px;vertical-align: middle;">
 	<thead>
     <tr style="background-color:lightgray">
-      <th>Brand</th>
-      <th>Model</th>
-      <th>Kind</th>
-      <th>Description</th>
-      <th>Quantity</th>
-      <th>Provider</th>
-      <th>Phone</th>
+      <th style="width:30px; padding:8px 5px;">Brand</th>
+      <th style="width:100px; padding:8px 5px;">Model</th>
+      <th style="padding:5px;">Descrips</th>
+      <th style="width:20px; padding:8px 5px;">Q.ty</th>
+      <th style="width:40px; padding:8px 5px;">Vendor</th>
 
     </tr>
     </thead>
   {% for result in results %}
     <tbody>
     	<tr style="background-color:DeepSkyBlue">
-    		<td>{{result.0}}</td>
-    		<td>{{result.1}}</td>
-    		<td>{{result.2}}</td>
-    		<td>{{result.3}}</td>
-    		<td>{{result.4}}</td>
-    		<td>{{result.5}}</td>
-    		<td>{{result.6}}</td>
+    		<td style="padding:8px 5px;">{{result.brand}}</td>
+        <td style="padding:8px 5px;">{{result.model}}</td>
+        <td style="padding:8px 5px;">{{result.description}}</td>
+        <td style="padding:8px 5px;">{{result.quantity}}</td>
+        <td style="padding:8px 5px;"><a tabindex="0" role="button" class="btn btn-link" data-toggle="popover" title="Hotline: {{result.phone}}" data-popover-content="#{{ forloop.counter0 }}" style="padding:0;">{{result.provider}}</a></td>
+        <div id="{{ forloop.counter0 }}" style="display:none;">
+          {% if result.store.all %}
+          {% for store in result.store.all %}
+          <p>{{store.name}}: {{store.address}}</p>
+          {% endfor %}
+          {% else %}
+          <p>waiting for provider update infomation.</p>
+          {% endif %}
+          <hr noshade>
+          <div class="icon">
+          <a id="link_form" href="{{result.get_absolute_url}}"><i class="fas fa-envelope"></i></a>
+          {% if result.user.provider.skype_name %}
+           <a href="skype:{{result.user.provider.skype_name}}?chat"><i class="fab fa-skype"></i></a>
+          {% endif %}
+          {% if result.user.provider.zalo_link %}
+           <a href="{{result.user.provider.zalo_link}}"><div class="zalo-share-button" data-href="" data-oaid="579745863508352884" data-layout="3" data-color="blue" data-customize=false></div></a>
+          {% endif %}
+          </div>
+        </div>
     	</tr>
     </tbody>
   {% endfor %}
@@ -131,6 +146,11 @@
     }); // end click
 
     $("#search").click(function() {
+      var search_value = $("#search_value").val().trim();
+
+      if (search_value=="") {
+        return false;
+      }
       $("#form").submit();
     }); // end click
 
@@ -139,7 +159,7 @@
       var model = $("#model").val();
       var description = $("#description").val();
       var kind = $("#kind").val();
-      var provider = $("provider").val();
+      var provider = $("#provider").val();
 
       if (brand==""&&model==""&&description==""&&kind==""&&provider=="") {
         alert("Please fill out at least one field!");
@@ -147,7 +167,23 @@
       } // end if
       $("#form_filter").submit();
 
-    }); // end click
+      }); // end click
+
+    $(function () {
+        $('[data-toggle="popover"]').popover({
+          html : true,
+          content: function() {
+            var content = $(this).attr("data-popover-content");
+            return $(content).html();
+          }
+          });
+        }); //end popper
+
+      $("body").on("click","#link_form",function(evt) {
+        evt.preventDefault();
+        var link = $(this).attr("href");
+        var new_window = open(link,"Send email","width=500,height=800");
+      }); // end body click
 
   }); // end ready
 </script>

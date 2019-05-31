@@ -31,8 +31,6 @@
 			<div class="col-6 quotation__info-body">{{device.kind}}</div>
 			<div class="col-6 quotation__info-header">Description</div>
 			<div class="col-6 quotation__info-body">{{device.description}}</div>
-			<div class="col-6 quotation__info-header">Provider</div>
-			<div class="col-6 quotation__info-body">{{device.provider}}</div>
 
 		</div>
 		<form action="{{device.get_absolute_url}}" class="quotation__form" method="post" id="form">
@@ -114,7 +112,7 @@ $(document).ready(function() {
 			alert("Please supple a number to quantity field!");
 			return false;
 		}
-
+		$("#sub_bt").attr("disabled","disabled");
 		$("#form").submit();
 	}); //end click
 }); //end ready

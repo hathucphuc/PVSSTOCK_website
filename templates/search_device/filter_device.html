@@ -65,14 +65,7 @@
         <input type="text" class="form-control" name="description" id="description">
         {% endif %}
       </div>
-      <div class="form-group col-sm-4">
-        <label for="provider">Provider</label>
-        {% if form_filter.provider.value %}
-        <input type="text" class="form-control" name="provider" id="provider" value="{{form_filter.provider.value}}">
-        {% else %}
-        <input type="text" class="form-control" name="provider" id="provider">
-        {% endif %}
-      </div>
+      
     </div>
     <button class="btn" id="search_adv" type="button">Search</button>
     <button class="btn btn-link btn-sm" type="button" id="hide"><i class="fas fa-angle-double-up" style="padding-right:3px;"></i>hide</button>
@@ -87,7 +80,7 @@
       <th style="width:100px; padding:8px 5px;">Model</th>
       <th style="padding:5px;">Descrips</th>
       <th style="width:20px; padding:8px 5px;">Q.ty</th>
-      <th style="width:40px; padding:8px 5px;">Vendor</th>
+      <th style="width:40px; padding:8px 5px;">Price</th>
 
     </tr>
     </thead>
@@ -95,10 +88,16 @@
     <tbody>
     	<tr style="background-color:DeepSkyBlue">
     		<td style="padding:8px 5px;">{{result.brand}}</td>
-        <td style="padding:8px 5px;">{{result.model}}</td>
+        <td style="padding:8px 5px;"><a href="{{result.get_absolute_url}}" id="link_form">{{result.model}}</a></td>
         <td style="padding:8px 5px;">{{result.description}}</td>
+        {% if result.comparison %}
+        <td style="padding:8px 5px;">{{result.quantity_total}}</td>
+        {% else %}
         <td style="padding:8px 5px;">{{result.quantity}}</td>
-        <td style="padding:8px 5px;"><a tabindex="0" role="button" class="btn btn-link" data-toggle="popover" title="Hotline: {{result.phone}}" data-popover-content="#{{ forloop.counter0 }}" style="padding:0;">{{result.provider}}</a></td>
+        {% endif %}
+        <td style="padding:8px 5px;">{{result.price}}</td>
+        
+        <!-- <td style="padding:8px 5px;"><a tabindex="0" role="button" class="btn btn-link" data-toggle="popover" title="Hotline: {{result.phone}}" data-popover-content="#{{ forloop.counter0 }}" style="padding:0;">{{result.provider}}</a></td>
         <div id="{{ forloop.counter0 }}" style="display:none;">
           {% if result.store.all %}
           {% for store in result.store.all %}
@@ -117,7 +116,8 @@
            <a href="{{result.user.provider.zalo_link}}"><div class="zalo-share-button" data-href="" data-oaid="579745863508352884" data-layout="3" data-color="blue" data-customize=false></div></a>
           {% endif %}
           </div>
-        </div>
+        </div> -->
+
     	</tr>
     </tbody>
   {% endfor %}
@@ -159,9 +159,9 @@
       var model = $("#model").val();
       var description = $("#description").val();
       var kind = $("#kind").val();
-      var provider = $("#provider").val();
+      // var provider = $("#provider").val();
 
-      if (brand==""&&model==""&&description==""&&kind==""&&provider=="") {
+      if (brand==""&&model==""&&description==""&&kind=="") {
         alert("Please fill out at least one field!");
         return false;
       } // end if
@@ -169,15 +169,15 @@
 
       }); // end click
 
-    $(function () {
-        $('[data-toggle="popover"]').popover({
-          html : true,
-          content: function() {
-            var content = $(this).attr("data-popover-content");
-            return $(content).html();
-          }
-          });
-        }); //end popper
+    // $(function () {
+    //     $('[data-toggle="popover"]').popover({
+    //       html : true,
+    //       content: function() {
+    //         var content = $(this).attr("data-popover-content");
+    //         return $(content).html();
+    //       }
+    //       });
+    //     }); //end popper
 
       $("body").on("click","#link_form",function(evt) {
         evt.preventDefault();

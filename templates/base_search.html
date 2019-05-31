@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
     <!-- Custom styles for this template -->
-    <link href="{% static 'css/agency.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/agency.css' %}" rel="stylesheet">
     <link href="{% static 'css/profile.css' %}" rel="stylesheet">
     <link href="{% static 'css/pagination_result.css' %}" rel="stylesheet">
     <link href="{% static 'css/filter_form.css' %}" rel="stylesheet">
@@ -50,9 +50,11 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav text-uppercase ml-auto">
             {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="{% url 'import_data' %}">Upload</a>
-            </li>
+            {% if user.is_provider %}
+              <li class="nav-item">
+                <a class="nav-link js-scroll-trigger" href="{% url 'import_data' %}">Upload</a>
+              </li>
+              {% endif %}
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="{% url 'user:profile' %}">Profile</a>
             </li>

@@ -98,14 +98,22 @@
 }
 /* search bar */
 
+.input-group-append{
+    /*border:1px solid red;*/
+    padding-left: 10px;
+}
 .search_input{
     border-radius: 25px 0 0 25px;
-    width:60%;
-    
-    }
+    width:80%;
+    height: 40px;
+    /*border: 1px solid #f2f3f5;*/
+    background-color: #f2f3f5;
+    padding-left: 15px;
+}
 
 .search_icon{
     border-radius: 0 25px 25px 0;
+    margin-right: 0;
     }
 
 .icon{
@@ -121,4 +129,17 @@
 .fa-skype{
     font-size: 35px;
     color: Dodgerblue;
+}
+
+.control_bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#search_bar{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }

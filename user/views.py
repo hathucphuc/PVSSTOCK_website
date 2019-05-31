@@ -27,8 +27,9 @@ from django.views.generic import View
 from .utils import MailContextViewMixin
 from .forms import (
     ResendActivationEmailForm, ProviderSignUpForm, ProviderChangeForm)
+from .models import Provider, User
 from search_device.forms import AddDeviceForm, AddStoreForm
-from search_device.models import ManageDevice
+from search_device.models import ManageDevice, RequestQuota
 
 
 # Create your views here.
@@ -141,37 +142,47 @@ class ResendActivationEmail(
 
 def profile(request):
     user = request.user
-    if user.is_superuser:
-        roles = "Admin"
-    elif user.is_staff:
-        roles = "PVS staff"
+    tickets = RequestQuota.objects.all()
+    # view for PVS staffs
+    if user.is_staff:
+        if user.is_superuser:
+            roles = "Admin"
+        else:
+            roles = "PVS staff"
+        list_device = ManageDevice.objects.filter(public=True)
+        if request.method=="POST":
+            form = ProviderChangeForm(request.POST,user=request.user)
+            if form.is_valid():
+                form.save()
+                return redirect("user:profile")
+        else:
+            form = ProviderChangeForm()
+            vendors = User.objects.filter(is_provider=True)
+        return render(request,"user/profile_pvs.html",{"form":form,"roles":roles,"list_device":list_device,"vendors":vendors,"tickets":tickets})
+
+    # view for vendor
     elif user.is_provider:
         roles = "Provider"
-    list_device = ManageDevice.objects.filter(user=user)
-    if request.method == "POST":
-        form = ProviderChangeForm(request.POST,user=request.user)
-        form_add = AddDeviceForm(request.POST,user=request.user)
-        form_add_store = AddStoreForm()
-        if form_add.is_valid():
-            print("form_add")
-            form_add.save()
-            return redirect("user:profile")
-        
+        list_device = ManageDevice.objects.filter(user=user)
+        if request.method == "POST":
+            form = ProviderChangeForm(request.POST,user=request.user)
+            form_add = AddDeviceForm(request.POST,user=request.user)
+            form_add_store = AddStoreForm()
+            if form_add.is_valid():
+                print("form_add")
+                form_add.save()
+                return redirect("user:profile")
+            
+            elif form.is_valid():
+                form.save()
+                print("456")
+                return redirect("user:profile")
 
- 
-        elif form.is_valid():
-            form.save()
-            print("456")
-            return redirect("user:profile")
-
-        
-        
-    else:
-        form = ProviderChangeForm()
-        form_add = AddDeviceForm(user=user)
-        form_add_store = AddStoreForm()
-        
-    return render(request,"user/profile.html",{"form":form,"form_add":form_add,"form_add_store":form_add_store,"user":user,"roles":roles,"list_device":list_device})
+        else:
+            form = ProviderChangeForm()
+            form_add = AddDeviceForm(user=user)
+            form_add_store = AddStoreForm()           
+        return render(request,"user/profile.html",{"form":form,"form_add":form_add,"form_add_store":form_add_store,"user":user,"roles":roles,"list_device":list_device})
 
 
 

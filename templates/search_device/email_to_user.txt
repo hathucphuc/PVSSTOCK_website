@@ -1,16 +1,17 @@
-Hi,
+Dear value Customer,
 
-We have received your request quotation.
+Thanks for using and booking equipment via our https://pvstock.vn platform.
 
-This is device information:
+Bellow are your detail ordering devices:
 
--Model: {{form.device.model}}
--Brand: {{form.device.brand}}
--Kind: {{form.device.kind}}
--Description: {{form.device.description}}
+-Model: {{device.model}}
+-Brand: {{device.brand}}
+-Kind: {{device.kind}}
+-Description: {{device.description}}
 -Quantity: {{form.quantity}}
--Vendor: {{form.device.user.provider.name}}
 
-The Vendor will contact to you for detail soon.
 
-Thank you!
+Please see our attact offical quotation, Our sale team will contact to you soon for next processing.
+
+Best regart!
+

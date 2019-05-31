@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError, FieldError, ObjectDoesNotExi
 
 from .models import UploadExcel, ManageDevice, Store, RequestQuota
 
+from .utils import get_price
 
 
 
@@ -46,7 +47,7 @@ class AddDeviceForm(forms.ModelForm):
 
 	class Meta:
 		model = ManageDevice
-		fields = ["brand","model","description","public","kind","quantity","store"]
+		fields = ["brand","model","description","public","kind","quantity","store","price"]
 		#widgets = {
            # 'store': forms.CheckboxSelectMultiple,}
 
@@ -70,7 +71,11 @@ class AddDeviceForm(forms.ModelForm):
 		except(FieldError, ValueError, ObjectDoesNotExist):
 			
 			return model
-    	
+	def clean_price(self):
+		price = self.cleaned_data["price"]
+		price = get_price(price)
+		return price
+   	
 
 	def save(self,**kwargs):
 		new = super().save(commit=False)
@@ -87,9 +92,14 @@ class AddDeviceForm(forms.ModelForm):
 		return new
 
 class EditDeviceForm(AddDeviceForm):
+	class Meta:
+		model = ManageDevice
+		fields = ["brand","model","description","public","kind","quantity","store","price","note"]
 	def __init__(self, *args, **kwargs):
 		self.pk = kwargs.pop('pk',None)
 		super(EditDeviceForm, self).__init__(*args, **kwargs)
+		self.fields["note"].required=False
+
 
 	def clean_model(self):
 		model = self.cleaned_data["model"].upper()
@@ -111,10 +121,10 @@ class FilterForm(forms.Form):
 	model = forms.CharField(required=False)
 	kind = forms.CharField(required=False)
 	description = forms.CharField(required=False)
-	provider = forms.CharField(required=False)
+	# provider = forms.CharField(required=False)
 
 	class Meta:
-		fields = ["brand","model","description","kind","provider",]
+		fields = ["brand","model","description","kind"]
 
 
 class AddStoreForm(forms.ModelForm):
@@ -139,11 +149,15 @@ class AddStoreForm(forms.ModelForm):
 			return name
 
 class RequestQuotaForm(forms.ModelForm):
-
 	
 	class Meta:
 		model = RequestQuota
-		fields = ["company_name","phone","email","quantity"]
+		fields = ["company_name","phone","email","quantity","price_quote"]
+	def __init__(self, *args, **kwargs):
+		super(RequestQuotaForm, self).__init__(*args, **kwargs)
+		self.fields["price_quote"].required=False
+
+
 
 		
 

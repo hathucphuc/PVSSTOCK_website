@@ -50,7 +50,8 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     def __str__(self):
         if self.is_provider:
-            return self.provider.name
+            # return self.provider.name
+            return self.email
         else:
             return self.email
 

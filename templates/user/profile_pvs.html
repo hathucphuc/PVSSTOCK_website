@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{block.super}} - Profile PVS' staff
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:160px;">
+
+	<div class="row justify-content-center">
+		<div class="col-md-10">
+			<div class="profile-head">
+				<h4>{{user.provider.name}}</h4>
+				<h6>{{roles}}</h6>
+				<ul class="nav nav-tabs" href="#about">
+					<li class="nav-item">
+						<a class="nav-link" id="about-tab" href="#about">About</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#edit" id="edit-tab">Edit</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="#device" id="device-tab">Devices</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#ticket" id="device-tab">Tickets</a>
+					</li>
+
+				</ul>
+			</div>
+		</div>
+				
+	</div>
+	
+	<div class="row justify-content-center" >
+		<div class="col-md-10">
+			<div class="tab-content profile-tab">
+			<div class="tab-pane fade" id="about">
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					User Id
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.id}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.name}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Full Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.full_name}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Email
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.email}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Phone
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.phone}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Website Link
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.url}}</p>
+				</div>
+			</div>
+			{%if user.provider.skype_name %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Skype Name
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.skype_name}}</p>
+				</div>
+			</div>
+			{% endif %}
+			{%if user.provider.zalo_link %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					Zalo Link
+				</label></div>
+				<div class="col-md-6">
+					<p>{{user.provider.zalo_link}}</p>
+				</div>
+			</div>
+			{% endif %}
+			{% if user.store_set.all %}
+			<hr noshade>
+			
+			{% for store in user.store_set.all %}
+			<div class="row">
+				<div class="col-md-6"><label for="">
+					<a href="{{store.get_delete_url}}">{{store.name}}</a>
+				</label></div>
+				<div class="col-md-6">
+					<p>{{store.address}}</p>
+				</div>
+			</div>
+			{% endfor %}
+			{% endif %}
+			</div>
+
+			<div class="tab-pane fade" id="edit">
+				<form action="{% url 'user:profile' %}" method="post" id="form">
+					{% csrf_token %}
+					{% if form.name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="name" class="col-sm-3 col-form-label">Name</label>
+						{% if form.name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{form.name.value}}" id="name"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="name" id="name"></div>
+						{% endif %}
+					</div>
+					{% if form.full_name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.full_name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="full_name" class="col-sm-3 col-form-label">Full Name</label>
+						{% if form.full_name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" value="{{form.full_name.value}}" id="full_name"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="full_name" id="full_name"></div>
+						{% endif %}
+					</div>
+					{% if form.email.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.email.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="" class="col-sm-3 col-form-label">Email</label>
+						{% if form.email.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" value="{{form.email.value}}" id="email"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="email" id="email"></div>
+						{% endif %}
+					</div>
+					{% if form.phone.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.phone.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="phone" class="col-sm-3 col-form-label">Phone</label>
+						{% if form.phone.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone" value="{{form.phone.value}}" id="phone"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="phone" id="phone"></div>
+						{% endif %}
+					</div>
+					{% if form.url.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.url.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="url" class="col-sm-3 col-form-label">Website Link</label>
+						{% if form.url.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="url" value="{{form.url.value}}" id="url"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="url" id="url"></div>
+						{% endif %}
+					</div>
+					{% if form.skype_name.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.skype_name.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="skype_name" class="col-sm-3 col-form-label">Skype Name</label>
+						{% if form.skype_name.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="skype_name" value="{{form.skype_name.value}}" id="skype_name"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="skype_name" id="skype_name"></div>
+						{% endif %}
+					</div>
+					{% if form.zalo_link.errors %}
+				      <ul class="custom_error_list">
+				        {% for error in form.zalo_link.errors %}
+				          <li><em>{{ error }}</em></li>
+				        {% endfor %}
+				      </ul>
+				    {% endif %}
+					<div class="form-group row">
+						<label for="zalo_link" class="col-sm-3 col-form-label">Zalo Link</label>
+						{% if form.zalo_link.value %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="zalo_link" value="{{form.zalo_link.value}}" id="zalo_link"></div>
+						{% else %}
+						<div class="col-sm-9"><input type="text" class="form-control" name="zalo_link" id="zalo_link"></div>
+						{% endif %}
+					</div>
+					
+					<p style="font-size:0.8em;color:red;"><i>( * just fill out the fields which you want to change infomation.)</i></p>
+					<a href="{% url 'user:pw_change' %}"><button class="btn btn-secondary" type="button" style="margin-bottom:30px;float:left;">Password</button></a>
+					<button class="btn btn-success" type="button" style="float:right;" id="change_bt">Confirm</button>
+				</form>
+
+			</div>
+			<div class="tab-pane fade  show active" id="device">
+				<div class="row justify-content-between" style="display:flex;align-items:center;">
+					<div class="col-8" style="padding-right:0;">
+					<div id="search_bar">
+						<input type="text" name="" placeholder="Search..." class="search_input" id="search">
+						
+						<button class="btn btn-light search_icon" disabled><i class="fa fa-search"></i></button>
+		
+					</div>
+					</div>
+					
+					<div class="col-4" style="text-align:right;">
+						<span>Vendors</span>
+						<select id="vendor">
+							<option value="">All</option>
+							{% if vendors %}
+							{% for vendor in vendors %}
+							<option value="">{{vendor.provider.name}}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+					
+				</div>
+				{% if list_device %}
+				<table class="table table-bordered" style="text-align:center;margin-top:20px;vertical-align: middle;">
+					<thead>
+				    <tr style="background-color:lightgray">
+				      <th>Brand</th>
+				      <th>Model</th>
+				      <th>Kind</th>
+				      <th>Description</th>
+				      <th>Quantity</th>
+				      <th>Price (VND)</th>
+				      <th>Note</th>
+				  
+
+				    </tr>
+				    </thead>
+				  {% for device in list_device %}
+				    <tbody>
+				    	<tr style="background-color:rgb(254,250,246);">
+				    		<td>{{device.brand}}</td>
+				    		<td><a tabindex="0" role="button" class="btn btn-link" data-toggle="popover" data-placement="left" title="Hotline: {{device.phone}}" data-popover-content="#{{ forloop.counter0 }}" style="padding:0;">{{device.model}}</a></td>
+
+				    		<div id="{{ forloop.counter0 }}" style="display:none;">
+					          {% if device.store.all %}
+					          {% for store in device.store.all %}
+					          <p>{{store.name}}: {{store.address}}</p>
+					          {% endfor %}
+					          {% else %}
+					          <p>waiting for provider update stores infomation.</p>
+					          {% endif %}
+					          <p>{{device.user.email}}</p>
+					          <hr noshade>
+					          <div class="icon">
+					          {% if device.user.provider.skype_name %}
+					           <a href="skype:{{device.user.provider.skype_name}}?chat"><i class="fab fa-skype"></i></a>
+					          {% endif %}
+					          {% if device.user.provider.zalo_link %}
+					           <a href="{{device.user.provider.zalo_link}}"><div class="zalo-share-button" data-href="" data-oaid="579745863508352884" data-layout="3" data-color="blue" data-customize=false></div></a>
+					          {% endif %}
+					          </div>
+					        </div>
+
+				    		<td>{{device.kind}}</td>
+				    		<td>{{device.description}}</td>
+				    		<td>{{device.quantity}}</td>
+				    		<td>{{device.price}}</td>
+				    		<td>{{device.note}}</td>
+				    		<td>{{device.user.provider.name}}</td>
+				    	</tr>
+				    </tbody>
+				  {% endfor %}
+				</table>
+
+				{% else %}
+				<h4>No Device</h4>
+
+				{% endif %}
+			</div>
+
+			<div class="tab-pane fade" id="ticket">
+				<div id="search_bar_ticket">
+						<input type="text" name="" placeholder="Search..." class="search_input" id="search_ticket">
+						
+						<button class="btn btn-light search_icon" disabled><i class="fa fa-search"></i></button>
+		
+				</div>
+				{% if tickets %}
+				<table class="table table-bordered" style="text-align:center;margin-top:20px;vertical-align: middle;">
+					<thead>
+				    <tr style="background-color:lightgray">
+				      <td>ID</td>
+				      <th>Company</th>
+				      <th>Email</th>
+				      <th>Phone</th>
+				      <th>Device</th>
+				      <th>Quantity</th>
+				      <th>Total Price (VND)</th>
+				      <th>Time received</th>
+				  
+
+				    </tr>
+				    </thead>
+				  {% for ticket in tickets %}
+				    <tbody>
+				    	<tr style="background-color:rgb(254,250,246);">
+				    		<th><a href="{{ticket.get_update_url}}">{{ticket.id}}</a></th>
+				    		<td>{{ticket.company_name}}</td>
+				    		<td>{{ticket.email}}</td>
+				    		<td>{{ticket.phone}}</td>
+				    		<td>{{ticket.device}}</td>
+				    		<td>{{ticket.quantity}}</td>
+				    		<td>{{ticket.price_quote}}</td>
+				    		<td>{{ticket.received_time}}</td>
+
+				    	</tr>
+				    </tbody>
+				  {% endfor %}
+				</table>
+
+				{% else %}
+				<h4>No Ticket</h4>
+
+				{% endif %}
+			</div>
+			
+		</div>
+		</div>
+
+	</div>
+
+
+</div>
+<script>
+$(document).ready(function() {
+	// navigate tab //
+	$(".nav-link").click(function() {
+		if ($(this).hasClass("active")) {
+			return false;
+		} else {
+			$(".nav-link").removeClass("active");
+			$(this).addClass("active");
+			var id = $(this).attr("href");
+			$(".tab-pane.fade").removeClass("show active");
+			$(id).addClass("show active");
+
+		} // end if			
+
+	});// end click
+
+	
+
+	// Change Information Profile //
+	$("#change_bt").click(function() {
+		var name = $("#name").val();
+		var full_name = $("#full_name").val();
+		var email = $("#email").val();
+		var phone = $("#phone").val();
+		var url = $("#url").val();
+		var skype_name = $("#skype_name").val();
+		var zalo_link = $("#zalo_link").val();
+		if (name==""&&full_name==""&&email==""&&phone==""&&url==""&&skype_name==""&&zalo_link=="") {
+			alert("Please fill at least one field!");
+			return false;
+		}
+
+		$("#form").submit();
+		
+	}); //end click
+
+
+	// seach bar //
+
+	var store = $("#store option:selected").text();
+	var public = $("#public option:selected").text();
+	var all_device = $("#device tbody tr");
+	var all_device_field = $("#device tbody tr td");
+	all_device_field.hide();
+	function showDevice(device) {
+		device.each(function() {
+			$(this).find("td").slice(0,7).show();
+		});
+	}
+
+	function search(show,devices) {
+		$("#search").focus(function() {
+			$(this).keyup(function() {
+				var valueSearch = $(this).val().trim();
+
+				if (valueSearch=="") {
+					show;
+
+				} else {
+					valueArray = valueSearch.split(" ");
+
+					all_device_field.hide();
+					for (var i=0;i<valueArray.length;i++) {
+						devices.each(function() {
+							var price = $(this).find("td").eq(5);
+							$(this).find("td").not(price).each(function() {
+								if ($(this).text().toLowerCase().includes(valueArray[i].toLowerCase())) {
+									showDevice($(this).parent());
+									return false;
+								}
+							}); //end each
+					}); // end each
+					} // end for
+
+				} // end if
+				
+			}); // end keyup
+		}); //end focus
+	}
+
+	showDevice(all_device);
+	search(showDevice(all_device),all_device);
+	
+	$("#vendor").change(function() {
+	var vendor = $("#vendor option:selected").text();
+	var get_device = $();
+	all_device_field.hide();
+
+	if (vendor=="All") {
+		showDevice(all_device);
+		search(showDevice(all_device),all_device);
+
+	} else if (vendor!="All") {
+		
+		all_device.each(function(){
+			if ($(this).find("td").eq(7).text()==vendor) {
+				showDevice($(this).parent());
+				get_device = get_device.add($(this).parent())
+			}
+		});
+		search(showDevice(get_device),get_device);
+	}
+
+	}); // end change
+
+	// search bar ticket
+	var all_tickets = $("#ticket tbody tr");
+	var all_tickets_field = $("#ticket tbody tr td");
+	search_ticket();
+
+	function search_ticket() {
+		$("#search_ticket").focus(function() {
+			$(this).keyup(function() {
+				var valueSearch = $(this).val().trim();
+
+				if (valueSearch=="") {
+					all_tickets.show();
+
+				} else {
+					valueArray = valueSearch.split(" ");
+
+					all_tickets.hide();
+					for (var i=0;i<valueArray.length;i++) {
+						all_tickets.each(function() {
+							// var price = $(this).find("td").eq(6);
+							$(this).find("td").each(function() {
+								if ($(this).text().toLowerCase().includes(valueArray[i].toLowerCase())) {
+									$(this).parent().show();
+									return false;
+								}
+							}); //end each
+					}); // end each
+					} // end for
+
+				} // end if
+				
+			}); // end keyup
+		}); //end focus
+	}
+
+	// popover
+	$(function () {
+      $('[data-toggle="popover"]').popover({
+        html : true,
+        content: function() {
+          var content = $(this).attr("data-popover-content");
+          return $(content).html();
+        }
+      });
+    }); //end popper
+
+    $('.popover-dismiss').popover({
+      //trigger: 'focus'//
+    }); // end popper
+	
+});// end ready
+	
+</script>
+
+{% endblock %}
+
+
